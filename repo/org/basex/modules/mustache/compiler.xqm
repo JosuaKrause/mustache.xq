@@ -4,7 +4,7 @@
 xquery version "3.0" ;
 module namespace compiler = "http://basex.org/modules/mustache/compiler";
 
-import module namespace parser = "http://basex.org/modules/mustache/parser";
+import module namespace parser = "http://basex.org/modules/mustache/parser" at 'parser.xqm';
 
 declare function compiler:compile( $parseTree, $json ) {
  let $div := parse-xml( concat( '&lt;div&gt;',
