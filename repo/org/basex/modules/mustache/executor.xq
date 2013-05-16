@@ -8,6 +8,9 @@ declare function local:seq_to_map($seq) {
   map:new(for $el at $i in $seq return map:entry($i, $el))
 };
 
-let $map := map { 'foo' := 42, 'bar' := map { 'foo' := local:seq_to_map((23, 45, 27)) } },
-  $ops := ( "bar", "foo", 2 )
-return local:exec($map, $ops)
+declare function local:id($el) {
+  function() { $el }
+};
+
+let $map := map { 'foo' := local:id(42), 'bar' := map { 'foo' := local:seq_to_map((local:id(23), local:id(45), local:id(27))) } }
+return local:exec($map, ( "bar", "foo", 3 ))()
