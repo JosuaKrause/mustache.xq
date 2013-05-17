@@ -1,0 +1,1 @@
+json:parse('{"foo&amp;bar": 3, "bar": "baz", "array": [1,2,3], "obj": {"a": "b"}}')

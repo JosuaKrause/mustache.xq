@@ -12,5 +12,5 @@ declare function local:id($el) {
   function() { $el }
 };
 
-let $map := map { 'foo' := local:id(42), 'bar' := map { 'foo' := local:seq_to_map((local:id(23), local:id(45), local:id(27))) } }
-return local:exec($map, ( "bar", "foo", 3 ))()
+let $map := map { 'foo' := local:id(42), 'bar' := map { 'foo' := local:seq_to_map((local:id(23), function() { 9 * 5 }, local:id(27))) } }
+return local:exec($map, ( "bar", "foo", 2 ))()
