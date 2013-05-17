@@ -32,14 +32,12 @@ declare function compiler:compile-node($node as element(), $map as map(*), $path
              return compiler:compile-intern($node, $kMap)
     (: error :)
     default return
-      "ERROR"
+      error('invalid command ' || $node)
   (:
   typeswitch($node)
-    case element(etag)    return compiler:eval( $node/@name, $json, $pos, $xpath )
     case element(utag)    return compiler:eval( $node/@name, $json, $pos, $xpath, false() )
     case element(rtag)    return 
       string-join(compiler:eval( $node/@name, $json, $pos, $xpath, true(), 'desc' ), " ")
-    case element(static)  return $node/string()
     case element(partial) return compiler:compile-xpath(parser:parse(file:read-text($node/@name)), $json, $pos, $xpath)
     case element(comment) return ()
     case element(inverted-section) return
@@ -52,18 +50,6 @@ declare function compiler:compile-node($node as element(), $map as map(*), $path
              then () 
              else compiler:compile-xpath( $node, $json )
        else compiler:compile-xpath( $node, $json ) 
-    case element(section) return
-      let $sNode := compiler:unpath( string( $node/@name ) , $json, $pos, $xpath )
-      return 
-        if ( $sNode/@boolean = "true" or ( not( empty( tokenize( $json/@booleans, '\s')[.=$node/@name] ) ) and $sNode/text() = "true" ) )
-        then compiler:compile-xpath( $node, $json, $pos, $xpath )
-        else
-          if ( $sNode/@type = "array" or ( not( empty( tokenize( $json/@arrays, '\s')[.=$node/@name] ) ) ) )
-          then (
-            for $n at $p in $sNode/node()
-            return compiler:compile-xpath( $node, $json, $p, concat( $xpath, '/', node-name($sNode), '/value' ) ) )
-          else if($sNode/@type = "object" or ( not( empty( tokenize( $json/@objects, '\s')[.=$node/@name] ) ) ) ) then 
-          compiler:compile-xpath( $node, $json, $pos, concat( $xpath,'/', node-name( $sNode ) ) ) else ()
     case text() return $node
     default return compiler:compile-xpath( $node, $json )
     :)
