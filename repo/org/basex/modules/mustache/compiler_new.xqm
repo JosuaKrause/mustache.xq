@@ -7,27 +7,32 @@ module namespace compiler = "http://basex.org/modules/mustache/compiler";
 import module namespace parser = "http://basex.org/modules/mustache/parser" at 'parser.xqm';
 
 declare function compiler:compile($parseTree as element(), $map as map(*)) {
-  compiler:compile-intern($parseTree, $map, ())
+  compiler:compile-intern($parseTree, $map)
 };
 
-declare function compiler:compile-intern($parseTree as element(), $map as map(*), $path as xs:anyAtomicType*) { 
+declare function compiler:compile-intern($parseTree as element(), $map as map(*)) { 
   for $node in $parseTree/node()
-  return compiler:compile-node($node, $map, $path)
+  return compiler:compile-node($node, $map, ())
 };
 
 declare function compiler:compile-node($node as element(), $map as map(*), $path as xs:anyAtomicType*) {
-  typeswitch($node)
+  let $curPath := compiler:inc-path($path, $node/@name)
+  return typeswitch($node)
     (: static text :)
-    case element(static)  return $node/string()
+    case element(static) return
+      $node/string()
     (: normal substitution :)
-    case element(etag)		return compiler:exec($map, compiler:inc-path($path, $node/@name))
+    case element(etag) return
+      compiler:exec($map, $curPath)
     (: section :)
     case element(section) return
-      let $sMap := compiler:unpath($map, compiler:inc-path($path, $node/@name))
+      let $sMap := compiler:unpath($map, $curPath)
       return for $key in map:keys($sMap)
-             return compiler:compile-intern($node, $sMap, ($key))
+             let $kMap := compiler:unpath($sMap, $key)
+             return compiler:compile-intern($node, $kMap)
     (: error :)
-    default							 return "ERROR"
+    default return
+      "ERROR"
   (:
   typeswitch($node)
     case element(etag)    return compiler:eval( $node/@name, $json, $pos, $xpath )
@@ -65,7 +70,7 @@ declare function compiler:compile-node($node as element(), $map as map(*), $path
 };
 
 declare function compiler:exec($map as map(*), $path as xs:anyAtomicType*) {
-  compiler:unpath($map, $path)()
+  fn:string(compiler:unpath($map, $path)())
 };
 
 declare function compiler:inc-path($path as xs:anyAtomicType*, $add as xs:anyAtomicType) as xs:anyAtomicType* {
@@ -73,5 +78,8 @@ declare function compiler:inc-path($path as xs:anyAtomicType*, $add as xs:anyAto
 };
 
 declare function compiler:unpath($map as map(*), $path as xs:anyAtomicType*) {
-  if (fn:count($path) = 1) then map:get($map, $path) else compiler:unpath(map:get($map, $path[1]), subsequence($path, 2))
+  switch(fn:count($path))
+    case 0 return $map
+    case 1 return map:get($map, $path)
+    default return compiler:unpath(map:get($map, $path[1]), subsequence($path, 2))
 };
