@@ -2,7 +2,7 @@ xquery version "3.0";
 
 import module namespace mustache = "http://basex.org/modules/mustache/mustache" at '../repo/org/basex/modules/mustache/mustache.xqm';
 
-let $map := map {"foo" := mustache:id("<b>bar</b>"),
+let $map := map {"foo" := mustache:id("foo"),
                  "arr" := mustache:seq_to_map((
                    map {"item" := mustache:id("hi")},
                    map {"item" := mustache:id("2")}

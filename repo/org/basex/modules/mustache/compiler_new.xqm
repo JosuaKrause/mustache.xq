@@ -55,7 +55,7 @@ declare function compiler:compile-node($node as element(), $map as map(*), $path
 };
 
 declare function compiler:uexec($map as map(*), $path as xs:anyAtomicType*) as node()* {
-  xquery:eval("<div>" || compiler:unpath($map, $path)() || "</div>")/*
+  xquery:eval("<div>" || compiler:unpath($map, $path)() || "</div>")/node()
 };
 
 declare function compiler:exec($map as map(*), $path as xs:anyAtomicType*) as node()* {
