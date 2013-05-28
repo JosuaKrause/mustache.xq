@@ -9,6 +9,11 @@ let $map := <root>
                 <entry name="foo">7</entry>
                 <entry name="foo">11</entry>
               </entry>
+              <entry name="bar">
+                <entry name="baz">
+                  <entry name="bar">hi</entry>
+                </entry>
+              </entry>
             </root>,
     $functions := map {
       "sum" := function($elem as element()) as node()* {
