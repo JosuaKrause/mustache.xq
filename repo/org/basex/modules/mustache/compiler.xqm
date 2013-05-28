@@ -42,7 +42,6 @@ declare function compiler:compile-node($node as element(), $map as element()*, $
       compiler:error('invalid command', $node)
   (:
   typeswitch($node)
-    case element(utag)    return compiler:eval( $node/@name, $json, $pos, $xpath, false() )
     case element(rtag)    return 
       string-join(compiler:eval( $node/@name, $json, $pos, $xpath, true(), 'desc' ), " ")
     case element(partial) return compiler:compile-xpath(parser:parse(file:read-text($node/@name)), $json, $pos, $xpath)
@@ -56,8 +55,6 @@ declare function compiler:compile-node($node as element(), $map as element()*, $
              then () 
              else compiler:compile-xpath( $node, $json )
        else compiler:compile-xpath( $node, $json ) 
-    case text() return $node
-    default return compiler:compile-xpath( $node, $json )
     :)
 };
 
