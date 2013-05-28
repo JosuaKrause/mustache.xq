@@ -17,5 +17,5 @@ let $map := <root>
                 <entry name="item">1</entry>
               </entry>
             </root>,
-    $template := '{{foo}}--{{{foo}}}:{{#arr}}{{item}}!{{/arr}}{{#map}}.{{foo}}{{/map}}{{#one}}g{{item}}!{{/one}}'
+    $template := '{{foo}}--{{!ignore me}}{{{foo}}}:{{#arr}}{{item}}!{{/arr}}{{#map}}.{{foo}}{{/map}}{{#one}}g{{item}}!{{/one}}{{#nothing}}never{{/nothing}}'
 return (:for $f in $map/entry[@name="map"]/entry return $f[@name="foo"]/text() :) mustache:compile(mustache:parse($template), $map)

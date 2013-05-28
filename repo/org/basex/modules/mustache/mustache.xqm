@@ -7,7 +7,7 @@ xquery version "3.0" ;
 module namespace mustache = "http://basex.org/modules/mustache/mustache";
 
 import module namespace parser = "http://basex.org/modules/mustache/parser" at 'parser.xqm';
-import module namespace compiler = "http://basex.org/modules/mustache/compiler" at 'compiler_new.xqm';
+import module namespace compiler = "http://basex.org/modules/mustache/compiler" at 'compiler.xqm';
 
 declare function mustache:parse($template as xs:string) as element() {
   parser:parse($template)
