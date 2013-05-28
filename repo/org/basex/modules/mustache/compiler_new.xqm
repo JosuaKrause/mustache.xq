@@ -6,29 +6,30 @@ module namespace compiler = "http://basex.org/modules/mustache/compiler";
 
 import module namespace parser = "http://basex.org/modules/mustache/parser" at 'parser.xqm';
 
-declare function compiler:compile($parseTree as element(), $map as map(*)) as node()* {
-  for $node in $parseTree/node()
-  return compiler:compile-node($node, $map, ())
+declare function compiler:compile($parseTree as element(), $map as element()) as node()* {
+  compiler:compile-intern($parseTree, $map/entry)
 };
 
-declare function compiler:compile-node($node as element(), $map as map(*), $path as xs:anyAtomicType*) as node()* {
+declare function compiler:compile-intern($parseTree as element(), $map as element()*) as node()* {
+  for $node in $parseTree/node()
+  return compiler:compile-node($node, $map)
+};
+
+declare function compiler:compile-node($node as element(), $map as element()*) as node()* {
   typeswitch($node)
     (: static text :)
     case element(static) return
       $node/text()
     (: normal substitution :)
     case element(etag) return
-      compiler:exec($map, compiler:inc-path($path, $node/@name))
+      compiler:exec(compiler:unpath($map, $node/@name))
     (: unescaped substitution :)
     case element(utag) return
-      compiler:uexec($map, compiler:inc-path($path, $node/@name))
+      compiler:uexec(compiler:unpath($map, $node/@name))
     (: section :)
     case element(section) return
-      let $curPath := compiler:inc-path($path, $node/@name),
-          $sMap := compiler:unpath($map, $curPath)
-      return for $key in map:keys($sMap)
-             let $kMap := compiler:unpath($sMap, $key)
-             return compiler:compile($node, $kMap)
+      for $curPath in compiler:unpath($map, $node/@name)/entry
+      return compiler:compile-intern($node, $curPath)
     (: error :)
     default return
       compiler:error('invalid command', $node)
@@ -54,23 +55,16 @@ declare function compiler:compile-node($node as element(), $map as map(*), $path
     :)
 };
 
-declare function compiler:uexec($map as map(*), $path as xs:anyAtomicType*) as node()* {
-  xquery:eval("<div>" || compiler:unpath($map, $path)() || "</div>")/node()
+declare function compiler:uexec($item as element()*) as node()* {
+  $item/node()
 };
 
-declare function compiler:exec($map as map(*), $path as xs:anyAtomicType*) as node()* {
-  text{ compiler:unpath($map, $path)() }
+declare function compiler:exec($item as element()*) as node()* {
+  text { $item }
 };
 
-declare function compiler:inc-path($path as xs:anyAtomicType*, $add as xs:anyAtomicType) as xs:anyAtomicType* {
-  insert-before($path, 1, ($add))
-};
-
-declare function compiler:unpath($map as map(*), $path as xs:anyAtomicType*) as function(*) {
-  switch(count($path))
-    case 0 return $map
-    case 1 return $map($path)
-    default return compiler:unpath($map(head($path)), tail($path))
+declare function compiler:unpath($map as element()*, $path as xs:string) as node()* {
+  $map[@name=$path]
 };
 
 declare function compiler:error($str as xs:string, $node as element()) {

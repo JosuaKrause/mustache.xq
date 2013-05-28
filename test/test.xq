@@ -2,18 +2,20 @@ xquery version "3.0";
 
 import module namespace mustache = "http://basex.org/modules/mustache/mustache" at '../repo/org/basex/modules/mustache/mustache.xqm';
 
-let $map := map {"foo" := mustache:id("foo"),
-                 "arr" := mustache:seq_to_map((
-                   map {"item" := mustache:id("hi")},
-                   map {"item" := mustache:id("2")}
-                 )),
-                 "map" := map {"c" := map { "foo" := function() {1+2}},
-                               "a" := map { "foo" := function() {3+4}},
-                               "b" := map { "foo" := function() {5+6}}
-                 },
-                 "one" := mustache:seq_to_map((
-                   map {"item" := mustache:id("1")}
-                 ))
-               },
+let $map := <root>
+              <entry name="foo"><bar>foo</bar></entry>
+              <entry name="arr">
+                <entry name="item">hi</entry>
+                <entry name="item">2</entry>
+              </entry>
+              <entry name="map">
+                <entry name="foo">3</entry>
+                <entry name="foo">7</entry>
+                <entry name="foo">11</entry>
+              </entry>
+              <entry name="one">
+                <entry name="item">1</entry>
+              </entry>
+            </root>,
     $template := '{{foo}}--{{{foo}}}:{{#arr}}{{item}}!{{/arr}}{{#map}}.{{foo}}{{/map}}{{#one}}g{{item}}!{{/one}}'
-return mustache:compile(mustache:parse($template), $map)
+return (:for $f in $map/entry[@name="map"]/entry return $f[@name="foo"]/text() :) mustache:compile(mustache:parse($template), $map)
