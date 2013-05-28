@@ -6,16 +6,16 @@ module namespace compiler = "http://basex.org/modules/mustache/compiler";
 
 import module namespace parser = "http://basex.org/modules/mustache/parser" at 'parser.xqm';
 
-declare function compiler:compile($parseTree as element(), $map as element()) as node()* {
-  compiler:compile-intern($parseTree, $map/entry)
+declare function compiler:compile($parseTree as element(), $map as element(), $functions as map(*)) as node()* {
+  compiler:compile-intern($parseTree, $map/entry, $functions)
 };
 
-declare function compiler:compile-intern($parseTree as element(), $map as element()*) as node()* {
+declare function compiler:compile-intern($parseTree as element(), $map as element()*, $functions as map(*)) as node()* {
   for $node in $parseTree/node()
-  return compiler:compile-node($node, $map)
+  return compiler:compile-node($node, $map, $functions)
 };
 
-declare function compiler:compile-node($node as element(), $map as element()*) as node()* {
+declare function compiler:compile-node($node as element(), $map as element()*, $functions as map(*)) as node()* {
   typeswitch($node)
     (: static text :)
     case element(static) return
@@ -29,7 +29,11 @@ declare function compiler:compile-node($node as element(), $map as element()*) a
     (: section :)
     case element(section) return
       for $curPath in compiler:unpath($map, $node/@name)/entry
-      return compiler:compile-intern($node, $curPath)
+        return compiler:compile-intern($node, $curPath, $functions)
+    (: function call :)
+    case element(fun) return
+      let $curPath := compiler:unpath($map, $node/@name)
+      return compiler:call($curPath, $curPath, $functions)
     (: comment :)
     case element(comment) return
       ()
@@ -63,6 +67,10 @@ declare function compiler:uexec($item as element()*) as node()* {
 
 declare function compiler:exec($item as element()*) as node()* {
   text { $item }
+};
+
+declare function compiler:call($item as element(), $node as element(), $functions as map(*)) as node()* {
+  $functions($item)($node)
 };
 
 declare function compiler:unpath($map as element()*, $path as xs:string) as node()* {

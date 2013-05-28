@@ -13,10 +13,10 @@ declare function mustache:parse($template as xs:string) as element() {
   parser:parse($template)
 };
 
-declare function mustache:compile($parseTree as element(), $input as xs:string, $inputParser as function(xs:string) as element()) as node()* {
-  mustache:compile($parseTree, $inputParser($input))
+declare function mustache:compile($parseTree as element(), $input as xs:string, $inputParser as function(xs:string) as element(), $functions as map(*)) as node()* {
+  mustache:compile($parseTree, $inputParser($input), $functions)
 };
 
-declare function mustache:compile($parseTree as element(), $map as element()) as node()* {
-  compiler:compile($parseTree, $map)
+declare function mustache:compile($parseTree as element(), $map as element(), $functions as map(*)) as node()* {
+  compiler:compile($parseTree, $map, $functions)
 };

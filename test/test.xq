@@ -16,6 +16,12 @@ let $map := <root>
               <entry name="one">
                 <entry name="item">1</entry>
               </entry>
+              <entry name="fun">sum</entry>
             </root>,
-    $template := '{{foo}}--{{!ignore me}}{{{foo}}}:{{#arr}}{{item}}!{{/arr}}{{#map}}.{{foo}}{{/map}}{{#one}}g{{item}}!{{/one}}{{#nothing}}never{{/nothing}}'
-return (:for $f in $map/entry[@name="map"]/entry return $f[@name="foo"]/text() :) mustache:compile(mustache:parse($template), $map)
+    $functions := map {
+      "sum" := function($elem as element()) as node()* {
+        text { sum($elem/../entry[@name="map"]/entry[@name="foo"]/number()) }
+      }
+    },
+    $template := '{{foo}}--{{!ignore me}}{{{foo}}}:{{#arr}}{{item}}!{{/arr}}{{#map}}.{{foo}}{{/map}}{{#one}}g{{item}}!{{/one}}{{#nothing}}never{{/nothing}}{{:fun}}'
+return (: for $f in $map/entry[@name="map"]/../entry return $f[@name="foo"] ( :) mustache:compile(mustache:parse($template), $map, $functions) (: :)
