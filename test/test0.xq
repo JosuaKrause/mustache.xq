@@ -12,7 +12,11 @@ let $map := <root>
               <fun>sum</fun>
               <map>
                 <foo>3</foo>
+              </map>
+              <map>
                 <foo>7</foo>
+              </map>
+              <map>
                 <foo>11</foo>
               </map>
               <bar>
@@ -34,7 +38,7 @@ let $map := <root>
         }
       }
     }',
-    $useJSON := true(),
+    $useJSON := false(),
     $functions := map {
       "sum" := function($elem as element()) as node()* {
         text { sum($elem/../map/foo/number()) }

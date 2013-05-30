@@ -6,7 +6,11 @@ let $map := <root>
               <entry name="fun">sum</entry>
               <entry name="map">
                 <entry name="foo">3</entry>
+              </entry>
+              <entry name="map">
                 <entry name="foo">7</entry>
+              </entry>
+              <entry name="map">
                 <entry name="foo">11</entry>
               </entry>
               <entry name="bar">
