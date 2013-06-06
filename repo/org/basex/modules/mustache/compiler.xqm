@@ -12,6 +12,8 @@ import module namespace parser = "http://basex.org/modules/mustache/parser" at '
    init
    iter
    next
+   text
+   xml
  :)
 
 declare function compiler:strictXMLcompiler() as map(*) {
@@ -27,6 +29,12 @@ declare function compiler:strictXMLcompiler() as map(*) {
     },
     "next" := function($path as node()*) as node()* {
       $path
+    },
+    "text" := function($item as element()*) as node()* {
+      text { serialize($item/node()) }
+    },
+    "xml" := function($item as element()*) as node()* {
+      $item/node()
     }
   }
 };
@@ -44,6 +52,12 @@ declare function compiler:freeXMLcompiler() as map(*) {
     },
     "next" := function($path as node()*) as node()* {
       element root {$path}
+    },
+    "text" := function($item as element()*) as node()* {
+      text { serialize($item/node()) }
+    },
+    "xml" := function($item as element()*) as node()* {
+      $item/node()
     }
   }
 };
@@ -61,6 +75,12 @@ declare function compiler:JSONcompiler() as map(*) {
     },
     "next" := function($path as node()*) as node()* {
       $path
+    },
+    "text" := function($item as element()*) as node()* {
+      text { $item }
+    },
+    "xml" := function($item as element()*) as node()* {
+      parse-xml-fragment( text { $item } )
     }
   }
 };
@@ -81,10 +101,10 @@ declare function compiler:compile-node($node as element(), $map as element()*, $
       $node/text()
     (: normal substitution :)
     case element(etag) return
-      compiler:exec($compiler("unpath")($map, $node/@name))
+      $compiler("text")(($compiler("unpath")($map, $node/@name)))
     (: unescaped substitution :)
     case element(utag) return
-      compiler:uexec($compiler("unpath")($map, $node/@name))
+      $compiler("xml")(($compiler("unpath")($map, $node/@name)))
     (: section :)
     case element(section) return
       for $curPath in $compiler("iter")($compiler("unpath")($map, $node/@name))
@@ -115,14 +135,6 @@ declare function compiler:compile-node($node as element(), $map as element()*, $
              else compiler:compile-xpath( $node, $json )
        else compiler:compile-xpath( $node, $json ) 
     :)
-};
-
-declare function compiler:uexec($item as element()*) as node()* {
-  $item/node()
-};
-
-declare function compiler:exec($item as element()*) as node()* {
-  text { $item }
 };
 
 declare function compiler:call($item as element(), $node as element(), $functions as map(*)) as node()* {

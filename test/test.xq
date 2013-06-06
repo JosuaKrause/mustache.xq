@@ -70,6 +70,8 @@ let $mapStrict :=
       }
     },
     $template := '{{#map}}{{foo}}+{{/map}}={{:fun}}{{bar.baz.bar}}({{lit}},{{{lit}}})'
-return element div { mustache:compile(mustache:parse($template), $mapStrict, $functionsStrict, mustache:strictXMLcompiler()) }
-(: return element div { mustache:compile(mustache:parse($template), $mapFree, $functionsFree, mustache:freeXMLcompiler()) } :)
-(: return element div { mustache:compile(mustache:parse($template), json:parse($mapJSON), $functionsJSON, mustache:JSONcompiler()) } :)
+return (
+  element elem { mustache:compile(mustache:parse($template), $mapStrict, $functionsStrict, mustache:strictXMLcompiler()) },
+  element free { mustache:compile(mustache:parse($template), $mapFree, $functionsFree, mustache:freeXMLcompiler()) },
+  element json { mustache:compile(mustache:parse($template), json:parse($mapJSON), $functionsJSON, mustache:JSONcompiler()) }
+)
