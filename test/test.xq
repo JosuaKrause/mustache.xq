@@ -19,6 +19,7 @@ let $mapStrict :=
             <entry name="bar">hi</entry>
           </entry>
         </entry>
+        <entry name="lit"><b>lit</b></entry>
       </root>,
     $mapFree :=
       <root>
@@ -37,6 +38,7 @@ let $mapStrict :=
             <bar>hi</bar>
           </baz>
         </bar>
+        <lit><b>lit</b></lit>
       </root>,
     $mapJSON := '{
       "fun": "sum",
@@ -49,7 +51,8 @@ let $mapStrict :=
         "baz": {
           "bar": "hi"
         }
-      }
+      },
+      "lit": "<b>lit</b>"
     }',
     $functionsFree := map {
       "sum" := function($elem as element()) as node()* {
@@ -66,7 +69,7 @@ let $mapStrict :=
         text { sum($elem/../map/value/foo/number()) }
       }
     },
-    $template := '{{#map}}{{foo}}+{{/map}}={{:fun}}{{bar.baz.bar}}'
+    $template := '{{#map}}{{foo}}+{{/map}}={{:fun}}{{bar.baz.bar}}({{lit}},{{{lit}}})'
 return element div { mustache:compile(mustache:parse($template), $mapStrict, $functionsStrict, mustache:strictXMLcompiler()) }
 (: return element div { mustache:compile(mustache:parse($template), $mapFree, $functionsFree, mustache:freeXMLcompiler()) } :)
 (: return element div { mustache:compile(mustache:parse($template), json:parse($mapJSON), $functionsJSON, mustache:JSONcompiler()) } :)
