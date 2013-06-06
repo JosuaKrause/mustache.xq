@@ -6,30 +6,104 @@ module namespace compiler = "http://basex.org/modules/mustache/compiler";
 
 import module namespace parser = "http://basex.org/modules/mustache/parser" at 'parser.xqm';
 
-declare function compiler:compile( $parseTree, $json ) {
- let $div := parse-xml( concat( '&lt;div&gt;',
-   string-join(compiler:compile-xpath( $parseTree, json:parse( $json ) ), ''),  '&lt;/div&gt;') )
-  return compiler:handle-escaping($div)
+(:
+ $compiler:
+   unpath
+   init
+   iter
+   next
+ :)
+
+declare function compiler:strictXMLcompiler() as map(*) {
+  map {
+    "unpath" := function($map as element()*, $path as xs:string) as node()* {
+      $map[@name=$path]
+    },
+    "init" := function($map as element()) as element()* {
+      $map/entry
+    },
+    "iter" := function($el as node()*) as node()* {
+      $el/entry
+    },
+    "next" := function($path as node()*) as node()* {
+      $path
+    }
+  }
 };
 
-declare function  compiler:compile-xpath( $parseTree, $json ) {
-  compiler:compile-xpath( $parseTree, $json, 1, '' )
-}; 
+declare function compiler:freeXMLcompiler() as map(*) {
+  map {
+    "unpath" := function($map as element()*, $path as xs:string) as node()* {
+      $map/node()[name() eq $path]
+    },
+    "init" := function($map as element()) as element()* {
+      $map
+    },
+    "iter" := function($el as node()*) as node()* {
+      $el/*
+    },
+    "next" := function($path as node()*) as node()* {
+      element root {$path}
+    }
+  }
+};
 
-declare function compiler:compile-xpath( $parseTree, $json, $pos, $xpath ) { 
-  for $node in $parseTree/node() 
-  return compiler:compile-node( $node, $json, $pos, $xpath ) } ;
+declare function compiler:JSONcompiler() as map(*) {
+  map {
+    "unpath" := function($map as element()*, $path as xs:string) as node()* {
+      $map/node()[name() eq $path]
+    },
+    "init" := function($map as element()) as element()* {
+      $map
+    },
+    "iter" := function($el as node()*) as node()* {
+      if(count($el/value) = 0) then $el else $el/value
+    },
+    "next" := function($path as node()*) as node()* {
+      $path
+    }
+  }
+};
 
-declare function compiler:compile-node( $node, $json, $pos, $xpath ) {
+declare function compiler:compile($parseTree as element(), $map as element(), $functions as map(*), $compiler as map(*)) as node()* {
+  compiler:compile-intern($parseTree, $compiler("init")($map), $functions, $compiler)
+};
+
+declare function compiler:compile-intern($parseTree as element(), $map as element()*, $functions as map(*), $compiler as map(*)) as node()* {
+  for $node in $parseTree/node()
+  return compiler:compile-node($node, $map, $functions, $compiler)
+};
+
+declare function compiler:compile-node($node as element(), $map as element()*, $functions as map(*), $compiler as map(*)) as node()* {
   typeswitch($node)
-    case element(etag)    return
-    compiler:eval( $node/@name, $json, $pos, $xpath )
-    case element(utag)    return compiler:eval( $node/@name, $json, $pos, $xpath, false() )
+    (: static text :)
+    case element(static) return
+      $node/text()
+    (: normal substitution :)
+    case element(etag) return
+      compiler:exec($compiler("unpath")($map, $node/@name))
+    (: unescaped substitution :)
+    case element(utag) return
+      compiler:uexec($compiler("unpath")($map, $node/@name))
+    (: section :)
+    case element(section) return
+      for $curPath in $compiler("iter")($compiler("unpath")($map, $node/@name))
+        return compiler:compile-intern($node, $compiler("next")($curPath), $functions, $compiler)
+    (: function call :)
+    case element(fun) return
+      let $curPath := $compiler("unpath")($map, $node/@name)
+      return compiler:call($curPath, $curPath, $functions)
+    (: comment :)
+    case element(comment) return
+      ()
+    (: error :)
+    default return
+      compiler:error('invalid command', $node)
+  (:
+  typeswitch($node)
     case element(rtag)    return 
       string-join(compiler:eval( $node/@name, $json, $pos, $xpath, true(), 'desc' ), " ")
-    case element(static)  return $node/string()
     case element(partial) return compiler:compile-xpath(parser:parse(file:read-text($node/@name)), $json, $pos, $xpath)
-    case element(comment) return ()
     case element(inverted-section) return
       let $sNode := compiler:unpath( string( $node/@name ) , $json, $pos, $xpath )
       return 
@@ -40,82 +114,21 @@ declare function compiler:compile-node( $node, $json, $pos, $xpath ) {
              then () 
              else compiler:compile-xpath( $node, $json )
        else compiler:compile-xpath( $node, $json ) 
-    case element(section) return
-      let $sNode := compiler:unpath( string( $node/@name ) , $json, $pos, $xpath )
-      return 
-        if ( $sNode/@boolean = "true" or ( not( empty( tokenize( $json/@booleans, '\s')[.=$node/@name] ) ) and $sNode/text() = "true" ) )
-        then compiler:compile-xpath( $node, $json, $pos, $xpath )
-        else
-          if ( $sNode/@type = "array" or ( not( empty( tokenize( $json/@arrays, '\s')[.=$node/@name] ) ) ) )
-          then (
-            for $n at $p in $sNode/node()
-            return compiler:compile-xpath( $node, $json, $p, concat( $xpath, '/', node-name($sNode), '/value' ) ) )
-          else if($sNode/@type = "object" or ( not( empty( tokenize( $json/@objects, '\s')[.=$node/@name] ) ) ) ) then 
-          compiler:compile-xpath( $node, $json, $pos, concat( $xpath,'/', node-name( $sNode ) ) ) else ()
-    case text() return $node
-    default return compiler:compile-xpath( $node, $json ) }; 
-
-declare function compiler:eval( $node-name, $json, $pos ) { 
-  compiler:eval($node-name, $json, $pos, '', true() ) };
-      
-declare function compiler:eval( $node-name, $json, $pos, $xpath ) { 
-  compiler:eval($node-name, $json, $pos, $xpath, true() ) };
-
-declare function compiler:eval( $node-name, $json, $pos, $xpath, $etag ) { 
- compiler:eval( $node-name, $json, $pos, $xpath, $etag, '' )
+    :)
 };
 
-declare function compiler:eval( $node-name, $json, $pos, $xpath, $etag, $desc ) { 
-  let $unpath :=  compiler:unpath( $node-name, $json, $pos, $xpath, $desc )
-  return try {
-    let $value := string( $unpath )
-    return if ($etag) 
-    then '{{b64:' || Q{java:org.basex.util.Base64}encode($value) || '}}'
-    else $value
-  } catch * { $unpath } };
-
-declare function compiler:unpath( $node-name, $json, $pos, $xpath ) { 
-  compiler:unpath( $node-name, $json, $pos, $xpath, '' )
+declare function compiler:uexec($item as element()*) as node()* {
+  $item/node()
 };
 
-declare function compiler:unpath( $node-name, $json, $pos, $xpath, $desc ) { 
-  let $xp := concat( '$json', $xpath, '[', $pos, ']/',
-    if ($desc='desc') then '/' else '', $node-name )
-  let $eval := xquery:eval( $xp, map { '$json' := $json } )
-  return $eval
+declare function compiler:exec($item as element()*) as node()* {
+  text { $item }
 };
 
-declare function compiler:handle-escaping( $div ) {
-  for $n in $div/node()
-  return compiler:handle-base64($n) };
+declare function compiler:call($item as element(), $node as element(), $functions as map(*)) as node()* {
+  $functions($item)($node)
+};
 
-declare function compiler:handle-base64( $node ) {
-  typeswitch($node)
-    case element()         return element {node-name($node)} {
-      for $a in $node/@*
-      return attribute {node-name($a)} {compiler:resolve-mustache-base64($a)}, 
-      compiler:handle-escaping( $node )}
-    case text()            return compiler:resolve-mustache-base64( $node)
-    default                return compiler:handle-escaping( $node ) };
-
-declare function compiler:resolve-mustache-base64( $text ) {
- string-join( for $token in tokenize($text, " ")
-  return 
-    if ( matches( $token, '\{\{b64:(.+?)\}\}' ) )
-    then 
-      let $as := analyze-string($token, '\{\{b64:(.+?)\}\}')
-      let $b64    := $as//*:group[@nr=1]
-      let $before := $as/*:match[1]/preceding::*:non-match[1]/string()
-      let $after  := $as/*:match[last()]/following::*:non-match[1]/string()
-      return string-join( ($before, 
-	for $b64-single in $b64 
-	let $decoded := Q{java:org.basex.util.base64}decode( string($b64-single) )
-        let $executed := 
-          if ( matches( $decoded, "(&lt;|&gt;|&amp;|&quot;|&apos;)" ) )
-          then string($decoded)
-          else string(try { xquery:eval( $decoded ) } catch * { $decoded })
-        return $executed, $after
-      ), '' )
-    else if ( matches( $token, '\{\{b64:\}\}' ) )
-    then ""
-    else $token, " ") };
+declare function compiler:error($str as xs:string, $node as element()) {
+  error(xs:QName("compiler:ERR001"), $str || ' ' || name($node) || '(' || $node/@name || ') "' || $node/@value || '"')
+};
