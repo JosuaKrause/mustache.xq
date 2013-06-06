@@ -2,27 +2,71 @@ xquery version "3.0";
 
 import module namespace mustache = "http://basex.org/modules/mustache/mustache" at '../repo/org/basex/modules/mustache/mustache.xqm';
 
-let $map := <root>
-              <entry name="fun">sum</entry>
-              <entry name="map">
-                <entry name="foo">3</entry>
-              </entry>
-              <entry name="map">
-                <entry name="foo">7</entry>
-              </entry>
-              <entry name="map">
-                <entry name="foo">11</entry>
-              </entry>
-              <entry name="bar">
-                <entry name="baz">
-                  <entry name="bar">hi</entry>
-                </entry>
-              </entry>
-            </root>,
-    $functions := map {
+let $mapStrict :=
+      <root>
+        <entry name="fun">sum</entry>
+        <entry name="map">
+          <entry name="foo">3</entry>
+        </entry>
+        <entry name="map">
+          <entry name="foo">7</entry>
+        </entry>
+        <entry name="map">
+          <entry name="foo">11</entry>
+        </entry>
+        <entry name="bar">
+          <entry name="baz">
+            <entry name="bar">hi</entry>
+          </entry>
+        </entry>
+      </root>,
+    $mapFree :=
+      <root>
+        <fun>sum</fun>
+        <map>
+          <foo>3</foo>
+        </map>
+        <map>
+          <foo>7</foo>
+        </map>
+        <map>
+          <foo>11</foo>
+        </map>
+        <bar>
+          <baz>
+            <bar>hi</bar>
+          </baz>
+        </bar>
+      </root>,
+    $mapJSON := '{
+      "fun": "sum",
+      "map": [
+        {"foo": 3},
+        {"foo": 7},
+        {"foo": 11}
+      ],
+      "bar": {
+        "baz": {
+          "bar": "hi"
+        }
+      }
+    }',
+    $functionsFree := map {
+      "sum" := function($elem as element()) as node()* {
+        text { sum($elem/../map/foo/number()) }
+      }
+    },
+    $functionsStrict := map {
       "sum" := function($elem as element()) as node()* {
         text { sum($elem/../entry[@name="map"]/entry[@name="foo"]/number()) }
       }
     },
-    $template := '{{#map}}{{foo}}+{{/map}}={{:fun}}'
-return element div { mustache:compile(mustache:parse($template), $map, $functions) }
+    $functionsJSON := map {
+      "sum" := function($elem as element()) as node()* {
+        text { sum($elem/../map/value/foo/number()) }
+      }
+    },
+    $template := '{{#map}}{{foo}}+{{/map}}={{:fun}}{{bar.baz.bar}}'
+return element div { mustache:compile(mustache:parse($template), $mapStrict, $functionsStrict, mustache:strictXMLcompiler()) }
+(: return element div { mustache:compile(mustache:parse($template), $mapFree, $functionsFree, mustache:freeXMLcompiler()) } :)
+(: return element div { mustache:compile(mustache:parse($template), json:parse($mapJSON), $functionsJSON, mustache:JSONcompiler()) } :)
