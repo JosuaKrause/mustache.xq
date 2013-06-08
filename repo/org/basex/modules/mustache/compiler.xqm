@@ -14,6 +14,7 @@ import module namespace parser = "http://basex.org/modules/mustache/parser" at '
    next
    text
    xml
+   (eval)
  :)
 
 declare function compiler:strictXMLcompiler() as map(*) {
@@ -81,6 +82,9 @@ declare function compiler:JSONcompiler() as map(*) {
     },
     "xml" := function($item as element()*) as node()* {
       parse-xml-fragment( text { $item } )
+    },
+    "eval" := function($item as element()*) as node()* {
+      xquery:eval( text { $item } )
     }
   }
 };
@@ -101,10 +105,15 @@ declare function compiler:compile-node($node as element(), $map as element()*, $
       $node/text()
     (: normal substitution :)
     case element(etag) return
-      $compiler("text")(($compiler("unpath")($map, $node/@name)))
+      $compiler("text")($compiler("unpath")($map, $node/@name))
     (: unescaped substitution :)
     case element(utag) return
-      $compiler("xml")(($compiler("unpath")($map, $node/@name)))
+      $compiler("xml")($compiler("unpath")($map, $node/@name))
+    (: inline code :)
+    case element(rtag) return
+      if(map:contains($compiler, "eval"))
+      then string-join($compiler("eval")($compiler("unpath")($map, $node/@name)), " ")
+      else compiler:error('no function for "eval"', $node)
     (: section :)
     case element(section) return
       for $curPath in $compiler("iter")($compiler("unpath")($map, $node/@name))
@@ -121,8 +130,6 @@ declare function compiler:compile-node($node as element(), $map as element()*, $
       compiler:error('invalid command', $node)
   (:
   typeswitch($node)
-    case element(rtag)    return 
-      string-join(compiler:eval( $node/@name, $json, $pos, $xpath, true(), 'desc' ), " ")
     case element(partial) return compiler:compile-xpath(parser:parse(file:read-text($node/@name)), $json, $pos, $xpath)
     case element(inverted-section) return
       let $sNode := compiler:unpath( string( $node/@name ) , $json, $pos, $xpath )
@@ -141,6 +148,6 @@ declare function compiler:call($item as element(), $node as element(), $function
   $functions($item)($node)
 };
 
-declare function compiler:error($str as xs:string, $node as element()) {
+declare function compiler:error($str as xs:string, $node as element()) as node()* {
   error(xs:QName("compiler:ERR001"), $str || ' ' || name($node) || '(' || $node/@name || ') "' || $node/@value || '"')
 };
