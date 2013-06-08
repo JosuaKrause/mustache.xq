@@ -16,6 +16,6 @@ declare function local:dispatch( $node ) {
     case text()            return fn:normalize-space($node)
     default                return local:canonicalize( $node ) } ;
 
-let $render  := local:canonicalize( document {  mustache:render( $template, $hash ) } )
+let $render  := local:canonicalize( document {  element div { mustache:compile(mustache:parse($template), json:parse($hash), map {  }, mustache:JSONcompiler()) } } )
 let $output := local:canonicalize(document { $output })
 return (fn:deep-equal($render, $output), $render)
