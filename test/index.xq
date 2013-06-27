@@ -5,31 +5,31 @@ declare variable $dir := file:dir-name(static-base-uri()) || '/';
 declare variable $tests := xquery:invoke($dir || 'tests.xml');
 
 declare function local:summarize( $name, $nodes ) {
-  let $parseTests       := fn:count($nodes/@parseTest)
-  let $compileTests     := fn:count($nodes/@compileTest)
-  let $okParseTests     := fn:count($nodes[@parseTest='ok'])
-  let $nokParseTests    := fn:count($nodes[@parseTest='NOK'])
-  let $okCompileTests   := fn:count($nodes[@compileTest='ok'])
-  let $nokCompileTests  := fn:count($nodes[@compileTest='NOK'])
+  let $parseTests       := count($nodes/@parseTest)
+  let $compileTests     := count($nodes/@compileTest)
+  let $okParseTests     := count($nodes[@parseTest='ok'])
+  let $nokParseTests    := count($nodes[@parseTest='NOK'])
+  let $okCompileTests   := count($nodes[@compileTest='ok'])
+  let $nokCompileTests  := count($nodes[@compileTest='NOK'])
   return element {$name}
   {(attribute total {$parseTests+$compileTests},
-  <parseTests   pass="{$okParseTests}"   fail="{$nokParseTests}"   
-    perc="{if($nokParseTests=0) then '100' else fn:round(100 * $okParseTests div ($okParseTests+ $nokParseTests))}"/>,
+  <parseTests pass="{$okParseTests}" fail="{$nokParseTests}"   
+    perc="{if($nokParseTests = 0) then '100' else round(100 * $okParseTests div ($okParseTests + $nokParseTests))}"/>,
   <compileTests pass="{$okCompileTests}" fail="{$nokCompileTests}" 
-    perc="{if ($nokCompileTests=0) then '100' else fn:round(100 * $okCompileTests div ($okCompileTests+$nokCompileTests))}"/>)} };
+    perc="{if($nokCompileTests = 0) then '100' else round(100 * $okCompileTests div ($okCompileTests + $nokCompileTests))}"/>)} };
 
 declare function local:parser-test( $template, $parseTree ) {
   xquery:invoke( $dir || 'run-parser.xq', map{
-	'template' := $template,
+	'template'  := $template,
 	'parseTree' := $parseTree
   })
 };
 
 declare function local:compiler-test( $template, $hash, $output ) {
-    xquery:invoke( $dir || 'run-compiler.xq', map{
+  xquery:invoke( $dir || 'run-compiler.xq', map{
 	'template' := $template,
-	'hash' := $hash,
-	'output' := $output
+	'hash'     := $hash,
+	'output'   := $output
   })
 };
 
@@ -37,21 +37,21 @@ let $results := <tests> {
 for $test at $i in $tests//test
 order by $test/@section
 return try {
-let $template       := $test/template/fn:string()
-let $hash           := $test/hash/fn:string()
-let $section        := $test/@section
-let $parseTree      := $test/parseTree/*
-let $result         := local:parser-test( $template, $parseTree )
-let $valid          := $result [1]
-let $mTree          := $result [2]
-let $output         := if ($valid) then $test/output/* else () (: Don't run compile tests if parsing failed :)
-let $compilerTest   := $hash and $output and $parseTree
-let $compiled       := if($compilerTest) then local:compiler-test( $template, $hash, $output ) else ()
-let $validCompiler  := $compiled [1]
-let $outputCompiler := $compiled [2]
+let $template       := $test/template/string()
+   ,$hash           := $test/hash/string()
+   ,$section        := $test/@section
+   ,$parseTree      := $test/parseTree/*
+   ,$result         := local:parser-test( $template, $parseTree )
+   ,$valid          := $result [1]
+   ,$mTree          := $result [2]
+   ,$output         := if ($valid) then $test/output/* else () (: Don't run compile tests if parsing failed :)
+   ,$compilerTest   := $hash and $output and $parseTree
+   ,$compiled       := if($compilerTest) then local:compiler-test( $template, $hash, $output ) else ()
+   ,$validCompiler  := $compiled [1]
+   ,$outputCompiler := $compiled [2]
 return <test position="{$i}" parseTest="{if($valid) then 'ok' else 'NOK'}">
          { $section, if($compilerTest) then attribute compileTest {if($validCompiler) then 'ok' else 'NOK'} else () }
-         { fn:string($test/@name)} 
+         { string($test/@name)} 
          { if($valid) then ()
            else 
              <parseTestExplanation> 
@@ -69,15 +69,14 @@ return <test position="{$i}" parseTest="{if($valid) then 'ok' else 'NOK'}">
                 <p> Got: {$outputCompiler} </p>
               </compileTestExplanation>
            else ()}
-       </test> } catch * { <test type="ERROR" i="{$err:code}"  parseTest="NOK" compileTest="NOK">{
-         $test/@name}
+       </test> } catch * { <test type="ERROR" i="{$err:code}"  parseTest="NOK" compileTest="NOK">{$test/@name}
          <stackTrace>{$err:description}</stackTrace>
          </test> }
 } </tests>
 return <result>
        { local:summarize( 'summary', $results/test ) }
     <sectionResults>
-      { let $sections := fn:distinct-values($results//@section)
+      { let $sections := distinct-values($results//@section)
        for $section in $sections return  local:summarize( $section, $results/test[@section=$section] ) }
     </sectionResults>
     {$results}
