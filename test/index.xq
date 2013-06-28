@@ -35,42 +35,44 @@ declare function local:compiler-test( $template, $hash, $output ) {
 
 let $results := <tests> {
 for $test at $i in $tests//test
+let $template := $test/template/string()
+   ,$hash     := $test/hash/string()
 order by $test/@section
 return try {
-let $template       := $test/template/string()
-   ,$hash           := $test/hash/string()
-   ,$section        := $test/@section
+let $section        := $test/@section
    ,$parseTree      := $test/parseTree/*
    ,$result         := local:parser-test( $template, $parseTree )
-   ,$valid          := $result [1]
-   ,$mTree          := $result [2]
+   ,$valid          := $result[1]
+   ,$mTree          := $result[2]
    ,$output         := if ($valid) then $test/output/* else () (: Don't run compile tests if parsing failed :)
    ,$compilerTest   := $hash and $output and $parseTree
    ,$compiled       := if($compilerTest) then local:compiler-test( $template, $hash, $output ) else ()
-   ,$validCompiler  := $compiled [1]
-   ,$outputCompiler := $compiled [2]
+   ,$validCompiler  := $compiled[1]
+   ,$outputCompiler := $compiled[2]
 return <test position="{$i}" parseTest="{if($valid) then 'ok' else 'NOK'}">
          { $section, if($compilerTest) then attribute compileTest {if($validCompiler) then 'ok' else 'NOK'} else () }
-         { string($test/@name)} 
+         { string($test/@name) } 
          { if($valid) then ()
            else 
              <parseTestExplanation> 
-               <p> Template: {$template} </p>
-               <p> Expected: {$parseTree} </p>  
-               <p> Got: {$mTree} </p>
+               <p>Template: {$template}</p>
+               <p>Expected: {$parseTree}</p>  
+               <p>Got: {$mTree}</p>
              </parseTestExplanation>}
          { if ($compilerTest) 
            then if($validCompiler) then ()
            else 
               <compileTestExplanation> 
-                <p> Template: {$template} </p>
-                <p> Hash: {$hash} </p>
-                <p> Expected: {$output} </p>
-                <p> Got: {$outputCompiler} </p>
+                <p>Template: {$template}</p>
+                <p>Hash: {$hash}</p>
+                <p>Expected: {$output}</p>
+                <p>Got: {$outputCompiler}</p>
               </compileTestExplanation>
            else ()}
        </test> } catch * { <test type="ERROR" i="{$err:code}"  parseTest="NOK" compileTest="NOK">{$test/@name}
          <stackTrace>{$err:description}</stackTrace>
+         <template>{$template}</template>
+         <hash>{$hash}</hash>
          </test> }
 } </tests>
 return <result>

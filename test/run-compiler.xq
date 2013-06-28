@@ -18,6 +18,12 @@ declare function local:dispatch( $node ) {
     default        return local:canonicalize( $node )
 };
 
-let $render := () (: local:canonicalize( document { element div { serialize(mustache:compile(mustache:parse($template), json:parse($hash), map {  }, mustache:JSONcompiler())) } } ) :)
-   ,$output := () (: local:canonicalize( document { $output } ) :)
-return true() (: (deep-equal($render, $output), $render) :)
+let $compiled := mustache:compile(
+      mustache:parse($template),
+      json:parse($hash),
+      map {  },
+      mustache:JSONcompiler()
+    )
+   ,$render   := local:canonicalize( document { element div { $compiled } } )
+   ,$output   := local:canonicalize( document { $output } )
+return (deep-equal($render, $output), $render)

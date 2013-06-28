@@ -22,6 +22,6 @@ declare function local:dispatch( $node ) {
     default        return local:canonicalize( $node )
 };
 
-let $mres  := () (: local:canonicalize(document { mustache:parse($template) }) :)
-   ,$ptree := () (: local:canonicalize(document { $parseTree }) :)
-return true() (:(deep-equal($mres, $ptree), $mres):)
+let $mres  := local:canonicalize(document { mustache:parse($template) })
+   ,$ptree := local:canonicalize(document { $parseTree })
+return (deep-equal($mres, $ptree), $mres)
