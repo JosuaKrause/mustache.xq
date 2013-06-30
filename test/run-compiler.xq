@@ -21,7 +21,7 @@ declare function local:dispatch( $node ) {
 
 let $compiled := mustache:compile(
       mustache:parse($template),
-      json:parse($hash),
+      if($compiler eq 'json') then json:parse($hash) else $hash,
       map {  },
       switch($compiler)
         case 'json' return mustache:JSONcompiler()

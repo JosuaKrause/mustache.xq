@@ -4,7 +4,7 @@ declare variable $dir := file:dir-name(static-base-uri()) || '/';
 
 declare variable $tests := xquery:invoke($dir || 'tests.xml');
 
-declare variable $compiler_type := "json";
+declare variable $compiler_type := "xmlf";
 
 declare function local:summarize( $name, $nodes ) {
   let $parseTests       := count($nodes/@parseTest)

@@ -2,6 +2,8 @@
   <test name="Variables" section="etag">
     <template>{'Hello {{word}}!'}</template>
     <hash compiler="json">{'{"word": "world"}'}</hash>
+    <hash compiler="xmlf"><word>world</word></hash>
+    <hash compiler="xmls"><entry name="word">world</entry></hash>
     <output><div>Hello world!</div></output>
     <parseTree>
       <multi>
