@@ -4,8 +4,6 @@
 xquery version "3.0" ;
 module namespace compiler = "http://basex.org/modules/mustache/compiler";
 
-import module namespace parser = "http://basex.org/modules/mustache/parser" at 'parser.xqm';
-
 (:
  $compiler:
    unpath
@@ -14,6 +12,7 @@ import module namespace parser = "http://basex.org/modules/mustache/parser" at '
    next
    text
    xml
+   finish
    (eval)
  :)
 
@@ -36,6 +35,9 @@ declare function compiler:strictXMLcompiler() as map(*) {
     },
     "xml" := function($item as element()*) as node()* {
       $item/node()
+    },
+    "finish" := function($node as node()*) as node()* {
+      $node
     }
   }
 };
@@ -59,6 +61,9 @@ declare function compiler:freeXMLcompiler() as map(*) {
     },
     "xml" := function($item as element()*) as node()* {
       $item/node()
+    },
+    "finish" := function($node as node()*) as node()* {
+      $node
     }
   }
 };
@@ -83,6 +88,9 @@ declare function compiler:JSONcompiler() as map(*) {
     "xml" := function($item as element()*) as node()* {
       parse-xml-fragment( text { $item } )
     },
+    "finish" := function($node as node()*) as node()* {
+      parse-xml-fragment( text { $node } )
+    },
     "eval" := function($item as element()*) as node()* {
       xquery:eval( text { $item } )
     }
@@ -90,7 +98,8 @@ declare function compiler:JSONcompiler() as map(*) {
 };
 
 declare function compiler:compile($parseTree as element(), $map as element(), $functions as map(*), $compiler as map(*)) as node()* {
-  compiler:compile-intern($parseTree, $compiler("init")($map), $functions, $compiler)
+  let $res := compiler:compile-intern($parseTree, $compiler("init")($map), $functions, $compiler)
+  return $compiler("finish")($res)
 };
 
 declare function compiler:compile-intern($parseTree as element(), $map as element()*, $functions as map(*), $compiler as map(*)) as node()* {
