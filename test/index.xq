@@ -4,6 +4,8 @@ declare variable $dir := file:dir-name(static-base-uri()) || '/';
 
 declare variable $tests := xquery:invoke($dir || 'tests.xml');
 
+declare variable $compiler_type := "json";
+
 declare function local:summarize( $name, $nodes ) {
   let $parseTests       := count($nodes/@parseTest)
   let $compileTests     := count($nodes/@compileTest)
@@ -29,14 +31,15 @@ declare function local:compiler-test( $template, $hash, $output ) {
   xquery:invoke( $dir || 'run-compiler.xq', map{
 	'template' := $template,
 	'hash'     := $hash,
-	'output'   := $output
+	'output'   := $output,
+  'compiler' := $compiler_type
   })
 };
 
 let $results := <tests> {
 for $test at $i in $tests//test
 let $template := $test/template/string()
-   ,$hash     := $test/hash/string()
+   ,$hash     := $test/hash[@compiler eq $compiler_type]
 order by $test/@section
 return try {
 let $section        := $test/@section
@@ -55,24 +58,24 @@ return <test position="{$i}" parseTest="{if($valid) then 'ok' else 'NOK'}">
          { if($valid) then ()
            else 
              <parseTestExplanation> 
-               <p>Template: {$template}</p>
-               <p>Expected: {$parseTree}</p>  
-               <p>Got: {$mTree}</p>
+               <template>{$template}</template>
+               <expected>{$parseTree}</expected>
+               <got>{$mTree}</got>
              </parseTestExplanation>}
          { if ($compilerTest) 
            then if($validCompiler) then ()
            else 
               <compileTestExplanation> 
-                <p>Template: {$template}</p>
-                <p>Hash: {$hash}</p>
-                <p>Expected: {$output}</p>
-                <p>Got: {$outputCompiler}</p>
+                <template>{$template}</template>
+                {$hash}
+                <expected>{$output}</expected>
+                <got>{$outputCompiler}</got>
               </compileTestExplanation>
            else ()}
        </test> } catch * { <test type="ERROR" i="{$err:code}"  parseTest="NOK" compileTest="NOK">{$test/@name}
          <stackTrace>{$err:description}</stackTrace>
          <template>{$template}</template>
-         <hash>{$hash}</hash>
+         {$hash}
          </test> }
 } </tests>
 return <result>

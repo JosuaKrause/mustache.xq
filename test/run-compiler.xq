@@ -5,6 +5,7 @@ import module namespace mustache = "http://basex.org/modules/mustache/mustache" 
 declare variable $template external;
 declare variable $hash     external;
 declare variable $output   external;
+declare variable $compiler external;
 
 declare function local:canonicalize($nodes) {
   for $node in $nodes/node() 
@@ -22,8 +23,12 @@ let $compiled := mustache:compile(
       mustache:parse($template),
       json:parse($hash),
       map {  },
-      mustache:JSONcompiler()
+      switch($compiler)
+        case 'json' return mustache:JSONcompiler()
+        case 'xmlf' return mustache:freeXMLcompiler()
+        case 'xmls' return mustache:strictXMLcompiler()
+        default return error(xs:QName("run.compiler:ERR001"), 'unknown compiler: ' || $compiler)
     )
-   ,$render   := local:canonicalize( document { element div { $compiled } } )
+   ,$render   := local:canonicalize( document { element div { parse-xml-fragment($compiled) } } )
    ,$output   := local:canonicalize( document { $output } )
 return (deep-equal($render, $output), $render)

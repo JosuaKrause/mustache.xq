@@ -1,7 +1,7 @@
 <tests>
   <test name="Variables" section="etag">
     <template>{'Hello {{word}}!'}</template>
-    <hash>{'{"word": "world"}'}</hash>
+    <hash compiler="json">{'{"word": "world"}'}</hash>
     <output><div>Hello world!</div></output>
     <parseTree>
       <multi>
@@ -13,24 +13,24 @@
   </test>
   <test name="Two mustaches With No Whitespace" section="whitespace">
     <template>{'{{word}}{{word}}!'}</template>
-    <hash>{'{"word": "la"}'}</hash>
+    <hash compiler="json">{'{"word": "la"}'}</hash>
     <output><div>lala!</div></output>
     <parseTree>
       <multi>
-        <etag name="word"/> 
-        <etag name="word"/> 
+        <etag name="word"/>
+        <etag name="word"/>
         <static>!</static>
       </multi>
     </parseTree>
   </test>
   <test name="Variables with embedded XQuery" section="etag">
     <template>{'x=4+5*2={{x}}'}</template>
-    <hash>{'{ "x": ' || ( xs:integer(4) + 5 ) * 2 || '}'}</hash>
+    <hash compiler="json">{'{ "x": ' || ( xs:integer(4) + 5 ) * 2 || '}'}</hash>
     <output><div>x=4+5*2=18</div></output>
     <parseTree>
-      <multi> 
-        <static>x=4+5*2=</static> 
-        <etag name="x"/> 
+      <multi>
+        <static>x=4+5*2=</static>
+        <etag name="x"/>
       </multi>
     </parseTree>
   </test>
@@ -39,38 +39,38 @@
     * {{age}}
     * {{company}}
     * {{{company}}}'}</template>
-    <hash>{'{
+    <hash compiler="json">{'{
       "name": "Chris",
       "company": "<b>GitHub</b>"
     }'}</hash>
     <output>
       <div>
-        * Chris 
+        * Chris
         *
         * &lt;b&gt;GitHub&lt;/b&gt;
         * <b>GitHub</b>
       </div>
     </output>
     <parseTree>
-      <multi> 
-        <static>* </static> 
-        <etag name="name"/> 
-        <static>* </static> 
-        <etag name="age"/> 
-        <static>* </static> 
-        <etag name="company"/> 
-        <static>* </static> 
-        <utag name="company"/> 
+      <multi>
+        <static>* </static>
+        <etag name="name"/>
+        <static>* </static>
+        <etag name="age"/>
+        <static>* </static>
+        <etag name="company"/>
+        <static>* </static>
+        <utag name="company"/>
       </multi>
     </parseTree>
   </test>
   <test name="Simple Escaped Variables with {{&amp;var}}" section="utag">
     <template>{'{{&amp; name}}'}</template>
-    <hash>{'{"name":"<b>Pete Aven</b>"}'}</hash>
+    <hash compiler="json">{'{"name":"<b>Pete Aven</b>"}'}</hash>
     <output><div><b>Pete Aven</b></div></output>
     <parseTree>
-      <multi> 
-        <utag name="name"/> 
+      <multi>
+        <utag name="name"/>
       </multi>
     </parseTree>
   </test>
@@ -79,28 +79,28 @@
     * {{age}}
     * {{company}}
     * {{&amp;company}}'}</template>
-    <hash>{'{
+    <hash compiler="json">{'{
       "name": "Chris",
       "company": "<b>GitHub</b>"
     }'}</hash>
     <output>
       <div>
-        * Chris 
+        * Chris
         *
         * &lt;b&gt;GitHub&lt;/b&gt;
         * <b>GitHub</b>
       </div>
     </output>
     <parseTree>
-      <multi> 
-        <static>* </static> 
-        <etag name="name"/> 
-        <static>* </static> 
-        <etag name="age"/> 
-        <static>* </static> 
-        <etag name="company"/> 
-        <static>* </static> 
-        <utag name="company"/> 
+      <multi>
+        <static>* </static>
+        <etag name="name"/>
+        <static>* </static>
+        <etag name="age"/>
+        <static>* </static>
+        <etag name="company"/>
+        <static>* </static>
+        <utag name="company"/>
       </multi>
     </parseTree>
   </test>
@@ -109,16 +109,16 @@
     {{#nothin}}
       Never shown!
     {{/nothin}}'}</template>
-    <hash>{'{
+    <hash compiler="json">{'{
       "person": true
     }'}</hash>
     <output><div>Shown.</div></output>
     <parseTree>
-      <multi> 
-        <static>Shown.</static> 
-        <section name="nothin"> 
-          <static>Never shown!</static> 
-        </section> 
+      <multi>
+        <static>Shown.</static>
+        <section name="nothin">
+          <static>Never shown!</static>
+        </section>
       </multi>
     </parseTree>
   </test>
@@ -127,16 +127,16 @@
     {{#nothin}}
       Also shown!
     {{/nothin}}'}</template>
-    <hash>{'{
+    <hash compiler="json">{'{
       "nothin": true
     }'}</hash>
     <output><div>Shown. Also shown!</div></output>
     <parseTree>
-      <multi> 
-        <static>Shown.</static> 
-        <section name="nothin"> 
-          <static>Also shown!</static> 
-        </section> 
+      <multi>
+        <static>Shown.</static>
+        <section name="nothin">
+          <static>Also shown!</static>
+        </section>
       </multi>
     </parseTree>
   </test>
@@ -145,16 +145,16 @@
     {{#nothin}}
       Never shown!
     {{/nothin}}'}</template>
-    <hash>{'{
+    <hash compiler="json">{'{
       "nothin": false
     }'}</hash>
     <output><div>Shown.</div></output>
     <parseTree>
-      <multi> 
-        <static>Shown.</static> 
-        <section name="nothin"> 
-          <static>Never shown!</static> 
-        </section> 
+      <multi>
+        <static>Shown.</static>
+        <section name="nothin">
+          <static>Never shown!</static>
+        </section>
       </multi>
     </parseTree>
   </test>
@@ -163,16 +163,16 @@
     {{#nothin}}
       Never shown!
     {{/nothin}}'}</template>
-    <hash>{'{
+    <hash compiler="json">{'{
       "nothin": []
     }'}</hash>
     <output><div>Shown.</div></output>
     <parseTree>
-      <multi> 
-        <static>Shown.</static> 
-        <section name="nothin"> 
-          <static>Never shown!</static> 
-        </section> 
+      <multi>
+        <static>Shown.</static>
+        <section name="nothin">
+          <static>Never shown!</static>
+        </section>
       </multi>
     </parseTree>
   </test>
@@ -180,7 +180,7 @@
     <template>{'{{#repo}}
     <b>{{name}}</b>
   {{/repo}}'}</template>
-    <hash>{'{
+    <hash compiler="json">{'{
       "repo": [
         { "name": "resque" },
         { "name": "hub" },
@@ -188,25 +188,25 @@
       ]
     }'}</hash>
     <output>
-      <div> 
-        <b>resque</b> 
-        <b>hub</b> 
-        <b>rip</b> 
+      <div>
+        <b>resque</b>
+        <b>hub</b>
+        <b>rip</b>
       </div>
     </output>
     <parseTree>
-      <multi> 
-        <section name="repo"> 
-          <static>&lt;b&gt;</static> 
-          <etag name="name"/> 
-          <static>&lt;/b&gt;</static> 
-        </section> 
+      <multi>
+        <section name="repo">
+          <static>&lt;b&gt;</static>
+          <etag name="name"/>
+          <static>&lt;/b&gt;</static>
+        </section>
       </multi>
     </parseTree>
   </test>
   <test name="Array of Strings" section="section">
     <template>{'{{#array_of_strings}} {{.}}! {{/array_of_strings}}'}</template>
-    <hash>{'{"array_of_strings": ["hello", "world"]}'}</hash>
+    <hash compiler="json">{'{"array_of_strings": ["hello", "world"]}'}</hash>
     <output><div>hello! world!</div></output>
     <parseTree>
       <multi>
@@ -222,16 +222,16 @@
     {{^nothin}}
       Also shown!
     {{/nothin}}'}</template>
-    <hash>{'{
+    <hash compiler="json">{'{
       "person": true
     }'}</hash>
     <output><div>Shown. Also shown!</div></output>
     <parseTree>
-      <multi> 
-        <static>Shown.</static> 
-        <inverted-section name="nothin"> 
-          <static>Also shown!</static> 
-        </inverted-section> 
+      <multi>
+        <static>Shown.</static>
+        <inverted-section name="nothin">
+          <static>Also shown!</static>
+        </inverted-section>
       </multi>
     </parseTree>
   </test>
@@ -240,16 +240,16 @@
     {{^nothin}}
       Not shown!
     {{/nothin}}'}</template>
-    <hash>{'{
+    <hash compiler="json">{'{
       "nothin": true
     }'}</hash>
     <output><div>Shown.</div></output>
     <parseTree>
-      <multi> 
-        <static>Shown.</static> 
-        <inverted-section name="nothin"> 
-          <static>Not shown!</static> 
-        </inverted-section> 
+      <multi>
+        <static>Shown.</static>
+        <inverted-section name="nothin">
+          <static>Not shown!</static>
+        </inverted-section>
       </multi>
     </parseTree>
   </test>
@@ -258,16 +258,16 @@
     {{^nothin}}
       Also shown!
     {{/nothin}}'}</template>
-    <hash>{'{
+    <hash compiler="json">{'{
       "nothin": false
     }'}</hash>
     <output><div>Shown. Also shown!</div></output>
     <parseTree>
-      <multi> 
-        <static>Shown.</static> 
-        <inverted-section name="nothin"> 
-          <static>Also shown!</static> 
-        </inverted-section> 
+      <multi>
+        <static>Shown.</static>
+        <inverted-section name="nothin">
+          <static>Also shown!</static>
+        </inverted-section>
       </multi>
     </parseTree>
   </test>
@@ -276,16 +276,16 @@
     {{^nothin}}
       Also shown!
     {{/nothin}}'}</template>
-    <hash>{'{
+    <hash compiler="json">{'{
       "nothin": []
     }'}</hash>
     <output><div>Shown. Also shown!</div></output>
     <parseTree>
-      <multi> 
-        <static>Shown.</static> 
-        <inverted-section name="nothin"> 
-          <static>Also shown!</static> 
-        </inverted-section> 
+      <multi>
+        <static>Shown.</static>
+        <inverted-section name="nothin">
+          <static>Also shown!</static>
+        </inverted-section>
       </multi>
     </parseTree>
   </test>
@@ -293,7 +293,7 @@
     <template>{'Testing {{^repo}}
     <b>{{name}}</b>
   {{/repo}}'}</template>
-    <hash>{'{
+    <hash compiler="json">{'{
       "repo": [
         { "name": "resque" },
         { "name": "hub" },
@@ -302,34 +302,34 @@
     }'}</hash>
     <output><div>Testing</div></output>
     <parseTree>
-      <multi> 
-        <static>Testing</static> 
-        <inverted-section name="repo"> 
-          <static>&lt;b&gt;</static> 
-          <etag name="name"/> 
-          <static>&lt;/b&gt;</static> 
-        </inverted-section> 
+      <multi>
+        <static>Testing</static>
+        <inverted-section name="repo">
+          <static>&lt;b&gt;</static>
+          <etag name="name"/>
+          <static>&lt;/b&gt;</static>
+        </inverted-section>
       </multi>
     </parseTree>
   </test>
   <test name="Comments"  section="comment">
     <template>{'<h1>Today{{! ignore me }}.</h1>'}</template>
-    <hash>{'{}'}</hash>
+    <hash compiler="json">{'{}'}</hash>
     <output><div><h1>Today.</h1></div></output>
     <parseTree>
-      <multi> 
-        <static>&lt;h1&gt;Today</static> 
-        <comment>ignore me</comment> 
-        <static>.&lt;/h1&gt;</static> 
+      <multi>
+        <static>&lt;h1&gt;Today</static>
+        <comment>ignore me</comment>
+        <static>.&lt;/h1&gt;</static>
       </multi>
     </parseTree>
   </test>
   <test name="After Taxes" section="complex">
-    <template>{'Hello {{name}}! You have just won ${{value}}! 
-    {{#in_ca}} Well, 
+    <template>{'Hello {{name}}! You have just won ${{value}}!
+    {{#in_ca}} Well,
       ${{taxed_value}}, after taxes.
     {{/in_ca}}'}</template>
-    <hash>{'{
+    <hash compiler="json">{'{
       "name": "Chris",
       "value": 10000,
       "taxed_value": ' || 10000 - (10000 * 0.4) || ',
@@ -357,21 +357,21 @@
     {{^repo}}
       No repos :(
     {{/repo}}'}</template>
-    <hash>{'{
+    <hash compiler="json">{'{
       "repo": []
     }'}</hash>
     <output><div>No repos :(</div></output>
     <parseTree>
-      <multi> 
-        <section name="repo"> 
-          <static>&lt;b&gt;</static> 
-          <etag name="name"/> 
-          <static>&lt;/b&gt;</static> 
-        </section> 
-        <static/> 
-        <inverted-section name="repo"> 
-          <static>No repos :(</static> 
-        </inverted-section> 
+      <multi>
+        <section name="repo">
+          <static>&lt;b&gt;</static>
+          <etag name="name"/>
+          <static>&lt;/b&gt;</static>
+        </section>
+        <static/>
+        <inverted-section name="repo">
+          <static>No repos :(</static>
+        </inverted-section>
       </multi>
     </parseTree>
   </test>
@@ -383,26 +383,26 @@
       <b>{{name}}</b>
     {{/repo}}
     '}</template>
-    <hash>{'{
+    <hash compiler="json">{'{
       "repo": []
     }'}</hash>
     <output><div>No repos :(</div></output>
     <parseTree>
-      <multi> 
-        <inverted-section name="repo"> 
-          <static>No repos :(</static> 
-        </inverted-section> 
-        <section name="repo"> 
-          <static>&lt;b&gt;</static> 
-          <etag name="name"/> 
-          <static>&lt;/b&gt;</static> 
-        </section> 
+      <multi>
+        <inverted-section name="repo">
+          <static>No repos :(</static>
+        </inverted-section>
+        <section name="repo">
+          <static>&lt;b&gt;</static>
+          <etag name="name"/>
+          <static>&lt;/b&gt;</static>
+        </section>
       </multi>
     </parseTree>
   </test>
   <test name="Simple Whitespace" section="whitespace">
     <template>{'{{tag}} foo'}</template>
-    <hash>{'{ "tag": "yo" }'}</hash>
+    <hash compiler="json">{'{ "tag": "yo" }'}</hash>
     <output><div>yo foo</div></output>
     <parseTree>
       <multi>
@@ -413,57 +413,57 @@
   </test>
   <test name="Descendant Extension" section="ext">
     <template>{'* {{*name}}'}</template>
-    <hash>{'{
+    <hash compiler="json">{'{
         "people": {
             "person": {
                 "name": "Chris"
             },
-            "name": "Jan" 
-        } 
+            "name": "Jan"
+        }
     }'}</hash>
     <output><div>* Chris Jan</div></output>
     <parseTree>
-      <multi> 
+      <multi>
         <static>*</static>
-        <rtag name="name"/> 
+        <rtag name="name"/>
       </multi>
     </parseTree>
   </test>
   <test name="Descendant Extension Inside Section" section="complex">
     <template>{'* {{#people}}{{#person}}{{*name}}{{/person}}{{/people}}'}</template>
-    <hash>{'{
+    <hash compiler="json">{'{
         "people": {
             "person": {
                 "name": "Chris",
                 "name": "Kelly"
             },
-            "name": "Jan" 
-        } 
+            "name": "Jan"
+        }
     }'}</hash>
     <output><div>* Chris Kelly</div></output>
     <parseTree>
-      <multi> 
-        <static>*</static> 
-        <section name="people"> 
-          <section name="person"> 
-            <rtag name="name"/> 
-          </section> 
-        </section> 
+      <multi>
+        <static>*</static>
+        <section name="people">
+          <section name="person">
+            <rtag name="name"/>
+          </section>
+        </section>
       </multi>
     </parseTree>
   </test>
   <test name="Dot Notation Sections" section="complex">
     <template>{'{{person.name}}'}</template>
-    <hash>{'{ "person": {
+    <hash compiler="json">{'{ "person": {
       "name": "Chris",
       "company": "<b>GitHub</b>"
     } }'}</hash>
     <output><div>Chris</div></output>
     <parseTree>
-      <multi> 
+      <multi>
         <section name="person">
           <etag name="name"/>
-        </section> 
+        </section>
       </multi>
     </parseTree>
   </test>
@@ -473,7 +473,7 @@
         {{b}}
       {{/a}}
     {{/foo}}'}</template>
-    <hash>{'{ "foo": [
+    <hash compiler="json">{'{ "foo": [
       {"a": {"b": 1}},
       {"a": {"b": 2}},
       {"a": {"b": 3}}
@@ -493,7 +493,7 @@
   </test>
   <test name="Welcome Joe" section="complex">
     <template>{'{{greeting}}, {{name}}!'}</template>
-    <hash>{'{
+    <hash compiler="json">{'{
       "name": "Joe",
       "greeting": "Welcome" }'}</hash>
     <output><div>Welcome, Joe!</div></output>
@@ -517,7 +517,7 @@
            {{/section}}
 {{/section}}
       {{/book}}'}</template>
-    <hash>{'
+    <hash compiler="json">{'
       {"book": {"section": {"section": {"section": {"p": "Alive!"}}}}}'}</hash>
     <output><div>Alive!</div></output>
     <parseTree>
@@ -558,7 +558,7 @@
       <p>The list is empty.</p>
     {{/empty}}
     '}</template>
-    <hash>{'{
+    <hash compiler="json">{'{
       "header": "Colors",
       "items": [
           {"name": "red", "first": true, "url": "#Red"},
@@ -572,36 +572,36 @@
     <li><a href="#Green">green</a></li>
     <li><a href="#Blue">blue</a></li></div></output>
     <parseTree>
-      <multi> 
-        <static>&lt;h1&gt;</static> 
-        <etag name="header"/> 
-        <static>&lt;/h1&gt;</static> 
-        <section name="bug"> 
-          <static/> 
-        </section> 
-        <static/> 
-        <section name="items"> 
-          <static/> 
-          <section name="first"> 
-            <static>&lt;li&gt;&lt;strong&gt;</static> 
-            <etag name="name"/> 
-            <static>&lt;/strong&gt;&lt;/li&gt;</static> 
-          </section> 
-          <static/> 
-          <section name="link"> 
-            <static>&lt;li&gt;&lt;a href=&quot;</static> 
-            <etag name="url"/> 
+      <multi>
+        <static>&lt;h1&gt;</static>
+        <etag name="header"/>
+        <static>&lt;/h1&gt;</static>
+        <section name="bug">
+          <static/>
+        </section>
+        <static/>
+        <section name="items">
+          <static/>
+          <section name="first">
+            <static>&lt;li&gt;&lt;strong&gt;</static>
+            <etag name="name"/>
+            <static>&lt;/strong&gt;&lt;/li&gt;</static>
+          </section>
+          <static/>
+          <section name="link">
+            <static>&lt;li&gt;&lt;a href=&quot;</static>
+            <etag name="url"/>
             <static>&quot;&gt;</static>
-            <etag name="name"/> 
-            <static>&lt;/a&gt;&lt;/li&gt;</static> 
-          </section> 
-          <static/> 
-        </section> 
-        <static/> 
-        <section name="empty"> 
-          <static>&lt;p&gt;The list is empty.&lt;/p&gt;</static> 
-        </section> 
-        <static/> 
+            <etag name="name"/>
+            <static>&lt;/a&gt;&lt;/li&gt;</static>
+          </section>
+          <static/>
+        </section>
+        <static/>
+        <section name="empty">
+          <static>&lt;p&gt;The list is empty.&lt;/p&gt;</static>
+        </section>
+        <static/>
       </multi>
     </parseTree>
   </test>
@@ -615,19 +615,19 @@
         {{/a_list}}
       </ul>
     {{/a_object}}'}</template>
-    <hash>{'{
+    <hash compiler="json">{'{
         "a_object": {
             "title": "this is an object",
             "description": "one of its attributes is a list",
             "a_list": [
                 {
-                    "label": "listitem1" 
+                    "label": "listitem1"
                 },
                 {
-                    "label": "listitem2" 
-                } 
-            ] 
-        } 
+                    "label": "listitem2"
+                }
+            ]
+        }
     }'}</hash>
     <output><div><h1>this is an object</h1>
       <p>one of its attributes is a list</p>
@@ -663,7 +663,7 @@
       {{index}}
     {{/terms}}
     '}</template>
-    <hash>{'{
+    <hash compiler="json">{'{
       "terms": [
         {"name": "t1", "index": 0},
         {"name": "t2", "index": 1}
@@ -692,12 +692,12 @@
   </test>
   <test name="Apos" section="complex">
     <template>{'{{apos}}{{control}}'}</template>
-    <hash>{'{"apos": "&#39;", "control":"X"}'}</hash>
+    <hash compiler="json">{'{"apos": "&#39;", "control":"X"}'}</hash>
     <output><div>&#39;X</div></output>
     <parseTree>
-      <multi> 
-        <etag name="apos"/> 
-        <etag name="control"/> 
+      <multi>
+        <etag name="apos"/>
+        <etag name="control"/>
       </multi>
     </parseTree>
   </test>
@@ -708,7 +708,7 @@
       {{name}}
       {{index}}
     {{/terms}}'}</template>
-    <hash>{'
+    <hash compiler="json">{'
       {"name": "name",
       "description": "desc",
       "terms": [
@@ -733,37 +733,37 @@
   </test>
   <test name="Sequencial Mustaches" section="complex">
     <template>{'I like going to the {{location}} because I find it {{verb}}'}</template>
-    <hash>{'{"location": "mall", "verb": "fun"}'}</hash>
+    <hash compiler="json">{'{"location": "mall", "verb": "fun"}'}</hash>
     <output><div>I like going to the mall because I find it fun</div></output>
     <parseTree>
-      <multi> 
-        <static>I like going to the</static> 
-        <etag name="location"/> 
-        <static>because I find it</static> 
-        <etag name="verb"/> 
+      <multi>
+        <static>I like going to the</static>
+        <etag name="location"/>
+        <static>because I find it</static>
+        <etag name="verb"/>
       </multi>
     </parseTree>
   </test>
   <test name="Dot Notation with Nested Sections" section="complex">
     <template>{'{{person.name.first}}'}</template>
-    <hash>{'{ "person": {
+    <hash compiler="json">{'{ "person": {
       "name": {"first": "Chris"},
       "company": "<b>GitHub</b>"
     } }'}</hash>
     <output><div>Chris</div></output>
     <parseTree>
-      <multi> 
+      <multi>
         <section name="person">
           <section name="name">
             <etag name="first"/>
           </section>
-        </section> 
+        </section>
       </multi>
     </parseTree>
   </test>
   <test name="Not Found" section="complex">
     <template>{'{{foo}}'}</template>
-    <hash>{'{ "bar": "yo" }'}</hash>
+    <hash compiler="json">{'{ "bar": "yo" }'}</hash>
     <output><div/></output>
     <parseTree>
       <multi>
@@ -775,7 +775,7 @@
     <template>{'{{tag1}} is in normal angular brackets.
 {{=<% %>=}}
 <%tag2%> is in ERB style.'}</template>
-    <hash>{'{
+    <hash compiler="json">{'{
   "tag1": "Tag 1",
   "tag2": "Tag 2"
 }'}</hash>
@@ -801,7 +801,7 @@ Tag 2 is in ERB style.</div></output>
 <%tag2%> is in ERB style.
 <%={{ }}=%>
 {{tag3}} is in normal style again.'}</template>
-    <hash>{'{
+    <hash compiler="json">{'{
   "tag1": "Tag 1",
   "tag2": "Tag 2",
   "tag3": "Tag 3"
@@ -831,7 +831,7 @@ Tag 3 is in normal style again.</div></output>
   </test>
   <test name="Partial import" section="partial">
     <template>{'<h2>Names</h2>{{#names}}{{> partial_import.xq}}{{/names}}'}</template>
-    <hash>{'{
+    <hash compiler="json">{'{
 	"names": [
 	  { "name": "Peter" },
 	  { "name": "Klaus" }
@@ -852,7 +852,7 @@ Tag 3 is in normal style again.</div></output>
   </test>
   <test name="Double partial import" section="partial">
     <template>{'<h2>Names</h2>{{#names}}{{> partial_import2.xq}}{{/names}}'}</template>
-    <hash>{'{
+    <hash compiler="json">{'{
 	"names": [
 	  { "name": "Peter" },
 	  { "name": "Klaus" }
@@ -876,12 +876,12 @@ Tag 3 is in normal style again.</div></output>
       Hi {{name}}!
     {{/person?}}'}</template>
     <parseTree>
-      <multi> 
-        <section name="person?"> 
-          <static>Hi</static> 
-          <etag name="name"/> 
-          <static>!</static> 
-        </section> 
+      <multi>
+        <section name="person?">
+          <static>Hi</static>
+          <etag name="name"/>
+          <static>!</static>
+        </section>
       </multi>
     </parseTree>
   </test>
@@ -902,9 +902,9 @@ Tag 3 is in normal style again.</div></output>
   <test name="Parser Simple Partial &gt;" section="parser">
     <template>{'Hello {{> world}}'}</template>
     <parseTree>
-      <multi> 
-        <static>Hello</static> 
-        <partial name="world"/> 
+      <multi>
+        <static>Hello</static>
+        <partial name="world"/>
       </multi>
     </parseTree>
   </test>
@@ -913,10 +913,10 @@ Tag 3 is in normal style again.</div></output>
       {{! author }}
       Nuno'}</template>
     <parseTree>
-      <multi> 
-        <static>Hello World</static> 
-        <comment>author</comment> 
-        <static>Nuno</static> 
+      <multi>
+        <static>Hello World</static>
+        <comment>author</comment>
+        <static>Nuno</static>
       </multi>
     </parseTree>
   </test>
@@ -933,19 +933,19 @@ Tag 3 is in normal style again.</div></output>
       {{name}} is awesome.
     {{/wrapped}}'}</template>
     <parseTree>
-      <multi> 
-        <section name="wrapped"> 
-          <etag name="name"/> 
-          <static>is awesome.</static> 
-        </section> 
+      <multi>
+        <section name="wrapped">
+          <etag name="name"/>
+          <static>is awesome.</static>
+        </section>
       </multi>
     </parseTree>
   </test>
   <test name="Parser Partial Test" section="parser">
     <template>{'{{> next_more}}'}</template>
     <parseTree>
-      <multi> 
-        <partial name="next_more"/> 
+      <multi>
+        <partial name="next_more"/>
       </multi>
     </parseTree>
   </test>
@@ -964,7 +964,7 @@ Tag 3 is in normal style again.</div></output>
 <!--
       <test name="" section="">
         <template>{''}</template>
-        <hash>{''}</hash>
+        <hash compiler="json">{''}</hash>
         <output><div></div></output>
         <parseTree>
           <multi/>

@@ -55,23 +55,23 @@ let $mapStrict :=
       "lit": "<b>lit</b>"
     }',
     $functionsFree := map {
-      "sum" := function($elem as element()) as node()* {
+      "sum" := function($elem as element()) as xs:string {
         text { sum($elem/../map/foo/number()) }
       }
     },
     $functionsStrict := map {
-      "sum" := function($elem as element()) as node()* {
+      "sum" := function($elem as element()) as xs:string {
         text { sum($elem/../entry[@name="map"]/entry[@name="foo"]/number()) }
       }
     },
     $functionsJSON := map {
-      "sum" := function($elem as element()) as node()* {
+      "sum" := function($elem as element()) as xs:string {
         text { sum($elem/../map/value/foo/number()) }
       }
     },
     $template := '{{#map}}{{foo}}+{{/map}}={{:fun}}{{bar.baz.bar}}({{lit}},{{{lit}}})'
 return (
-  element elem { mustache:compile(mustache:parse($template), $mapStrict, $functionsStrict, mustache:strictXMLcompiler()) },
-  element free { mustache:compile(mustache:parse($template), $mapFree, $functionsFree, mustache:freeXMLcompiler()) },
-  element json { mustache:compile(mustache:parse($template), json:parse($mapJSON), $functionsJSON, mustache:JSONcompiler()) }
+  element elem { parse-xml-fragment(mustache:compile(mustache:parse($template), $mapStrict, $functionsStrict, mustache:strictXMLcompiler())) },
+  element free { parse-xml-fragment(mustache:compile(mustache:parse($template), $mapFree, $functionsFree, mustache:freeXMLcompiler())) },
+  element json { parse-xml-fragment(mustache:compile(mustache:parse($template), json:parse($mapJSON), $functionsJSON, mustache:JSONcompiler())) }
 )
