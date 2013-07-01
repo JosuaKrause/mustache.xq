@@ -11,6 +11,7 @@ module namespace compiler = "http://basex.org/modules/mustache/compiler";
    init
    iter
    next
+   to_bool
    text
    xml
    (eval)
@@ -29,6 +30,10 @@ declare function compiler:strictXMLcompiler() as map(*) {
     },
     "next" := function($path as node()*) as node()* {
       $path
+    },
+    "to_bool" := function($el as node()*) as xs:boolean? {
+      let $t := if($el = ()) then "" else serialize($el)
+      return if($t = "" or $t = "false" or $t = "true") then $t = "true" else ()
     },
     "text" := function($item as element()*) as xs:string* {
       for $i in $item
@@ -55,6 +60,10 @@ declare function compiler:freeXMLcompiler() as map(*) {
     "next" := function($path as node()*) as node()* {
       element root {$path}
     },
+    "to_bool" := function($el as node()*) as xs:boolean? {
+      let $t := if($el = ()) then "" else serialize($el)
+      return if($t = "" or $t = "false" or $t = "true") then $t = "true" else ()
+    },
     "text" := function($item as element()*) as xs:string* {
       for $i in $item
       return serialize(serialize($i/node()))
@@ -79,6 +88,10 @@ declare function compiler:JSONcompiler() as map(*) {
     },
     "next" := function($path as node()*) as node()* {
       $path
+    },
+    "to_bool" := function($el as node()*) as xs:boolean? {
+      let $t := if($el = ()) then "" else serialize($el)
+      return if($t = "" or $t = "false" or $t = "true") then $t = "true" else ()
     },
     "text" := function($item as element()*) as xs:string* {
       for $i in $item
@@ -124,8 +137,20 @@ declare function compiler:compile-node($node as element(), $map as element()*, $
       else compiler:error('002', 'no function for "eval"', $node)
     (: section :)
     case element(section) return
-      for $curPath in $compiler("iter")($compiler("unpath")($map, $node/@name))
-      return compiler:compile-intern($node, $compiler("next")($curPath), $functions, $compiler)
+      let $cp   := $compiler("iter")($compiler("unpath")($map, $node/@name))
+         ,$bool := $compiler("to_bool")($cp)
+      return if(count($bool) = 0)
+             then for $curPath in $cp
+                  return compiler:compile-intern($node, $compiler("next")($curPath), $functions, $compiler)
+             else if($bool)
+                  then compiler:compile-intern($node, $map, $functions, $compiler)
+                  else ()
+    case element(inverted-section) return
+      let $cp   := $compiler("iter")($compiler("unpath")($map, $node/@name))
+         ,$bool := $compiler("to_bool")($cp)
+      return if(count($bool) = 0 or $bool)
+             then ()
+             else compiler:compile-intern($node, $map, $functions, $compiler)
     (: function call :)
     case element(fun) return
       let $curPath := $compiler("unpath")($map, $node/@name)

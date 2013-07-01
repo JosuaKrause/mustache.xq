@@ -238,12 +238,12 @@
     <template>{'{{#array_of_strings}} {{.}}! {{/array_of_strings}}'}</template>
     <hash compiler="json">{'{"array_of_strings": ["hello", "world"]}'}</hash>
     <hash compiler="xmlf">
-      <array__of__strings>hello</array__of__strings>
-      <array__of__strings>world</array__of__strings>
+      <array_of_strings>hello</array_of_strings>
+      <array_of_strings>world</array_of_strings>
     </hash>
     <hash compiler="xmls">
-      <entry name="array__of__strings">hello</entry>
-      <entry name="array__of__strings">world</entry>
+      <entry name="array_of_strings">hello</entry>
+      <entry name="array_of_strings">world</entry>
     </hash>
     <output><div>hello! world!</div></output>
     <parseTree>
@@ -556,11 +556,7 @@
     </parseTree>
   </test>
   <test name="Nested Sections" section="complex">
-    <template>{'{{#foo}}
-      {{#a}}
-        {{b}}
-      {{/a}}
-    {{/foo}}'}</template>
+    <template>{'{{#foo}}{{#a}}{{b}}{{/a}}{{/foo}}'}</template>
     <hash compiler="json">{'{ "foo": [
       {"a": {"b": 1}},
       {"a": {"b": 2}},
@@ -748,15 +744,13 @@
     </parseTree>
   </test>
   <test name="Section as Context" section="complex">
-    <template>{'{{#a_object}}
-      <h1>{{title}}</h1>
+    <template>{'{{#a_object}}<h1>{{title}}</h1>
       <p>{{description}}</p>
       <ul>
         {{#a_list}}
         <li>{{label}}</li>
         {{/a_list}}
-      </ul>
-    {{/a_object}}'}</template>
+      </ul>{{/a_object}}'}</template>
     <hash compiler="json">{'{
         "a_object": {
             "title": "this is an object",
