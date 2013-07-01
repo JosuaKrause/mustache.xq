@@ -96,7 +96,9 @@ declare function compiler:JSONcompiler() as map(*) {
 };
 
 declare function compiler:compile($parseTree as element(), $map as element(), $functions as map(*), $compiler as map(*)) as node()* {
-  parse-xml-fragment(string-join(compiler:compile-intern($parseTree, $compiler("init")($map), $functions, $compiler), ''))
+  let $strs := compiler:compile-intern($parseTree, $compiler("init")($map), $functions, $compiler)
+     ,$text := string-join($strs, '')
+  return parse-xml-fragment($text)
 };
 
 declare function compiler:compile-intern($parseTree as element(), $map as element()*, $functions as map(*), $compiler as map(*)) as xs:string* {
