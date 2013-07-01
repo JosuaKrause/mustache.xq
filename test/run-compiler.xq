@@ -29,6 +29,6 @@ let $compiled := mustache:compile(
         case 'xmls' return mustache:strictXMLcompiler()
         default return error(xs:QName("run.compiler:ERR001"), 'unknown compiler: ' || $compiler)
     )
-   ,$render   := local:canonicalize( document { element div { parse-xml-fragment($compiled) } } )
+   ,$render   := local:canonicalize( document { element div { $compiled } } )
    ,$output   := local:canonicalize( document { $output } )
 return (deep-equal($render, $output), $render)
