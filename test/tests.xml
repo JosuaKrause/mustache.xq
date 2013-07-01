@@ -93,6 +93,8 @@
       "name": "Chris",
       "company": "<b>GitHub</b>"
     }'}</hash>
+    <hash compiler="xmlf"><name>Chris</name><company><b>GitHub</b></company></hash>
+    <hash compiler="xmls"><entry name="name">Chris</entry><entry name="company"><b>GitHub</b></entry></hash>
     <output>
       <div>
         * Chris
@@ -122,6 +124,8 @@
     <hash compiler="json">{'{
       "person": true
     }'}</hash>
+    <hash comnpiler="xmlf"><person>true</person></hash>
+    <hash comnpiler="xmls"><entry name="person">true</entry></hash>
     <output><div>Shown.</div></output>
     <parseTree>
       <multi>
@@ -140,6 +144,8 @@
     <hash compiler="json">{'{
       "nothin": true
     }'}</hash>
+    <hash comnpiler="xmlf"><nothin>true</nothin></hash>
+    <hash comnpiler="xmls"><entry name="nothin">true</entry></hash>
     <output><div>Shown. Also shown!</div></output>
     <parseTree>
       <multi>
@@ -158,6 +164,8 @@
     <hash compiler="json">{'{
       "nothin": false
     }'}</hash>
+    <hash comnpiler="xmlf"><nothin>false</nothin></hash>
+    <hash comnpiler="xmls"><entry name="nothin">false</entry></hash>
     <output><div>Shown.</div></output>
     <parseTree>
       <multi>
@@ -176,6 +184,8 @@
     <hash compiler="json">{'{
       "nothin": []
     }'}</hash>
+    <hash comnpiler="xmlf"><nothin /></hash>
+    <hash comnpiler="xmls"><entry name="nothin" /></hash>
     <output><div>Shown.</div></output>
     <parseTree>
       <multi>
@@ -197,6 +207,16 @@
         { "name": "rip" }
       ]
     }'}</hash>
+    <hash compiler="xmlf">
+      <repo><name>resque</name></repo>
+      <repo><name>hub</name></repo>
+      <repo><name>rip</name></repo>
+    </hash>
+    <hash compiler="xmls">
+      <entry name="repo"><entry name="name">resque</entry></entry>
+      <entry name="repo"><entry name="name">hub</entry></entry>
+      <entry name="repo"><entry name="name">rip</entry></entry>
+    </hash>
     <output>
       <div>
         <b>resque</b>
@@ -217,6 +237,14 @@
   <test name="Array of Strings" section="section">
     <template>{'{{#array_of_strings}} {{.}}! {{/array_of_strings}}'}</template>
     <hash compiler="json">{'{"array_of_strings": ["hello", "world"]}'}</hash>
+    <hash compiler="xmlf">
+      <array__of__strings>hello</array__of__strings>
+      <array__of__strings>world</array__of__strings>
+    </hash>
+    <hash compiler="xmls">
+      <entry name="array__of__strings">hello</entry>
+      <entry name="array__of__strings">world</entry>
+    </hash>
     <output><div>hello! world!</div></output>
     <parseTree>
       <multi>
@@ -235,6 +263,8 @@
     <hash compiler="json">{'{
       "person": true
     }'}</hash>
+    <hash compiler="xmlf"><person>true</person></hash>
+    <hash compiler="xmls"><entry name="person">true</entry></hash>
     <output><div>Shown. Also shown!</div></output>
     <parseTree>
       <multi>
@@ -253,6 +283,8 @@
     <hash compiler="json">{'{
       "nothin": true
     }'}</hash>
+    <hash compiler="xmlf"><nothin>true</nothin></hash>
+    <hash compiler="xmls"><entry name="nothin">true</entry></hash>
     <output><div>Shown.</div></output>
     <parseTree>
       <multi>
@@ -271,6 +303,8 @@
     <hash compiler="json">{'{
       "nothin": false
     }'}</hash>
+    <hash compiler="xmlf"><nothin>false</nothin></hash>
+    <hash compiler="xmls"><entry name="nothin">false</entry></hash>
     <output><div>Shown. Also shown!</div></output>
     <parseTree>
       <multi>
@@ -289,6 +323,8 @@
     <hash compiler="json">{'{
       "nothin": []
     }'}</hash>
+    <hash compiler="xmlf"><nothin></nothin></hash>
+    <hash compiler="xmls"><entry name="nothin"></entry></hash>
     <output><div>Shown. Also shown!</div></output>
     <parseTree>
       <multi>
@@ -310,6 +346,16 @@
         { "name": "rip" }
       ]
     }'}</hash>
+    <hash compiler="xmlf">
+      <repo><name>resque</name></repo>
+      <repo><name>hub</name></repo>
+      <repo><name>rip</name></repo>
+    </hash>
+    <hash compiler="xmls">
+      <entry name="repo"><entry name="name">resque</entry></entry>
+      <entry name="repo"><entry name="name">hub</entry></entry>
+      <entry name="repo"><entry name="name">rip</entry></entry>
+    </hash>
     <output><div>Testing</div></output>
     <parseTree>
       <multi>
@@ -325,6 +371,8 @@
   <test name="Comments"  section="comment">
     <template>{'<h1>Today{{! ignore me }}.</h1>'}</template>
     <hash compiler="json">{'{}'}</hash>
+    <hash compiler="xmlf"></hash>
+    <hash compiler="xmls"></hash>
     <output><div><h1>Today.</h1></div></output>
     <parseTree>
       <multi>
@@ -344,6 +392,13 @@
       "value": 10000,
       "taxed_value": ' || 10000 - (10000 * 0.4) || ',
       "in_ca": true }'}</hash>
+    <hash compiler="xmlf"><name>Chris</name><value>10000</value><taxed_value>{ 10000 - (10000 * 0.4) }</taxed_value><in_ca>true</in_ca></hash>
+    <hash compiler="xmls">
+      <entry name="name">Chris</entry>
+      <entry name="value">10000</entry>
+      <entry name="taxed_value">{ 10000 - (10000 * 0.4) }</entry>
+      <entry name="in_ca">true</entry>
+    </hash>
     <output><div>Hello Chris! You have just won $10000! Well, $6000, after taxes.</div></output>
     <parseTree>
       <multi>
@@ -370,6 +425,8 @@
     <hash compiler="json">{'{
       "repo": []
     }'}</hash>
+    <hash compiler="xmlf"><repo></repo></hash>
+    <hash compiler="xmls"><entry name="repo"></entry></hash>
     <output><div>No repos :(</div></output>
     <parseTree>
       <multi>
@@ -396,6 +453,8 @@
     <hash compiler="json">{'{
       "repo": []
     }'}</hash>
+    <hash compiler="xmlf"><repo></repo></hash>
+    <hash compiler="xmls"><entry name="repo"></entry></hash>
     <output><div>No repos :(</div></output>
     <parseTree>
       <multi>
@@ -413,6 +472,8 @@
   <test name="Simple Whitespace" section="whitespace">
     <template>{'{{tag}} foo'}</template>
     <hash compiler="json">{'{ "tag": "yo" }'}</hash>
+    <hash compiler="xmlf"><tag>yo</tag></hash>
+    <hash compiler="xmls"><entry name="tag">yo</entry></hash>
     <output><div>yo foo</div></output>
     <parseTree>
       <multi>
@@ -431,6 +492,13 @@
             "name": "Jan"
         }
     }'}</hash>
+    <hash compiler="xmlf"><people><person><name>Chris</name></person><name>Jan</name></people></hash>
+    <hash compiler="xmls">
+      <entry name="people">
+        <entry name="person"><entry name="name">Chris</entry></entry>
+        <entry name="name">Jan</entry>
+      </entry>
+    </hash>
     <output><div>* Chris Jan</div></output>
     <parseTree>
       <multi>
@@ -450,6 +518,14 @@
             "name": "Jan"
         }
     }'}</hash>
+    <hash compiler="xmlf"><people><person><name>Chris</name></person><person><name>Kelly</name></person><name>Jan</name></people></hash>
+    <hash compiler="xmls">
+      <entry name="people">
+        <entry name="person"><entry name="name">Chris</entry></entry>
+        <entry name="person"><entry name="name">Kelly</entry></entry>
+        <entry name="name">Jan</entry>
+      </entry>
+    </hash>
     <output><div>* Chris Kelly</div></output>
     <parseTree>
       <multi>
@@ -468,6 +544,8 @@
       "name": "Chris",
       "company": "<b>GitHub</b>"
     } }'}</hash>
+    <hash compiler="xmlf"><person><name>Chris</name><company><b>GitHub</b></company></person></hash>
+    <hash compiler="xmls"><entry name="person"><entry name="name">Chris</entry><entry name="company"><b>GitHub</b></entry></entry></hash>
     <output><div>Chris</div></output>
     <parseTree>
       <multi>
@@ -488,6 +566,16 @@
       {"a": {"b": 2}},
       {"a": {"b": 3}}
     ] }'}</hash>
+    <hash compiler="xmlf">
+      <foo><a><b>1</b></a></foo>
+      <foo><a><b>2</b></a></foo>
+      <foo><a><b>3</b></a></foo>
+    </hash>
+    <hash compiler="xmls">
+      <entry name="foo"><entry name="a"><entry name="b">1</entry></entry></entry>
+      <entry name="foo"><entry name="a"><entry name="b">2</entry></entry></entry>
+      <entry name="foo"><entry name="a"><entry name="b">3</entry></entry></entry>
+    </hash>
     <output><div>123</div></output>
     <parseTree>
       <multi>
@@ -506,6 +594,8 @@
     <hash compiler="json">{'{
       "name": "Joe",
       "greeting": "Welcome" }'}</hash>
+    <hash compiler="xmlf"><name>Joe</name><greeting>Welcome</greeting></hash>
+    <hash compiler="xmls"><entry name="name">Joe</entry><entry name="greeting">Welcome</entry></hash>
     <output><div>Welcome, Joe!</div></output>
     <parseTree>
       <multi>
@@ -529,6 +619,12 @@
       {{/book}}'}</template>
     <hash compiler="json">{'
       {"book": {"section": {"section": {"section": {"p": "Alive!"}}}}}'}</hash>
+    <hash compiler="xmlf">
+      <book><section><section><section><p>Alive!</p></section></section></section></book>
+    </hash>
+    <hash compiler="xmls">
+      <entry name="book"><entry name="section"><entry name="section"><entry name="section"><entry name="p">Alive!</entry></entry></entry></entry></entry>
+    </hash>
     <output><div>Alive!</div></output>
     <parseTree>
       <multi>
@@ -577,6 +673,42 @@
       ],
       "empty": false
     }'}</hash>
+    <hash compiler="xmlf">
+      <header>Colors</header>
+      <items>
+        <name>red</name>
+        <first>true</first>
+        <url>#Red</url>
+      </items>
+      <items>
+        <name>green</name>
+        <link>true</link>
+        <url>#Green</url>
+      </items>
+      <items>
+        <name>blue</name>
+        <link>true</link>
+        <url>#Blue</url>
+      </items>
+    </hash>
+    <hash compiler="xmls">
+      <entry name="header">Colors</entry>
+      <entry name="items">
+        <entry name="name">red</entry>
+        <entry name="first">true</entry>
+        <entry name="url">#Red</entry>
+      </entry>
+      <entry name="items">
+        <entry name="name">green</entry>
+        <entry name="link">true</entry>
+        <entry name="url">#Green</entry>
+      </entry>
+      <entry name="items">
+        <entry name="name">blue</entry>
+        <entry name="link">true</entry>
+        <entry name="url">#Blue</entry>
+      </entry>
+    </hash>
     <output><div><h1>Colors</h1>
     <li><strong>red</strong></li>
     <li><a href="#Green">green</a></li>
@@ -639,6 +771,30 @@
             ]
         }
     }'}</hash>
+    <hash compiler="xmlf">
+      <a_object>
+        <title>this is an object</title>
+        <description>one of its attributes is a list</description>
+        <a_list>
+          <label>listitem1</label>
+        </a_list>
+        <a_list>
+          <label>listitem2</label>
+        </a_list>
+      </a_object>
+    </hash>
+    <hash compiler="xmls">
+      <entry name="a_object">
+        <entry name="title">this is an object</entry>
+        <entry name="description">one of its attributes is a list</entry>
+        <entry name="a_list">
+          <entry name="label">listitem1</entry>
+        </entry>
+        <entry name="a_list">
+          <entry name="label">listitem2</entry>
+        </entry>
+      </entry>
+    </hash>
     <output><div><h1>this is an object</h1>
       <p>one of its attributes is a list</p>
       <ul>
@@ -679,6 +835,26 @@
         {"name": "t2", "index": 1}
       ]
     }'}</hash>
+    <hash compiler="xmlf">
+      <terms>
+        <name>t1</name>
+        <index>0</index>
+      </terms>
+      <terms>
+        <name>t2</name>
+        <index>1</index>
+      </terms>
+    </hash>
+    <hash compiler="xmls">
+      <entry name="terms">
+        <entry name="name">t1</entry>
+        <entry name="index">0</entry>
+      </entry>
+      <entry name="terms">
+        <entry name="name">t2</entry>
+        <entry name="index">1</entry>
+      </entry>
+    </hash>
     <output><div>t1
     0
     t2
@@ -703,6 +879,14 @@
   <test name="Apos" section="complex">
     <template>{'{{apos}}{{control}}'}</template>
     <hash compiler="json">{'{"apos": "&#39;", "control":"X"}'}</hash>
+    <hash compiler="xmlf">
+      <apos>&#39;</apos>
+      <control>X</control>
+    </hash>
+    <hash compiler="xmls">
+      <entry name="apos">&#39;</entry>
+      <entry name="control">X</entry>
+    </hash>
     <output><div>&#39;X</div></output>
     <parseTree>
       <multi>
@@ -724,6 +908,30 @@
       "terms": [
         {"name": "t1", "index": 0},
         {"name": "t2", "index": 1} ] }'}</hash>
+    <hash compiler="xmlf">
+      <name>name</name>
+      <description>desc</description>
+      <terms>
+        <name>t1</name>
+        <index>0</index>
+      </terms>
+      <terms>
+        <name>t2</name>
+        <index>1</index>
+      </terms>
+    </hash>
+    <hash compiler="xmls">
+      <entry name="name">name</entry>
+      <entry name="description">desc</entry>
+      <entry name="terms">
+        <entry name="name">t1</entry>
+        <entry name="index">0</entry>
+      </entry>
+      <entry name="terms">
+        <entry name="name">t2</entry>
+        <entry name="index">1</entry>
+      </entry>
+    </hash>
     <output><div>name
         desc
           t1
@@ -744,6 +952,14 @@
   <test name="Sequencial Mustaches" section="complex">
     <template>{'I like going to the {{location}} because I find it {{verb}}'}</template>
     <hash compiler="json">{'{"location": "mall", "verb": "fun"}'}</hash>
+    <hash compiler="xmlf">
+      <location>mall</location>
+      <verb>fun</verb>
+    </hash>
+    <hash compiler="xmls">
+      <entry name="location">mall</entry>
+      <entry name="verb">fun</entry>
+    </hash>
     <output><div>I like going to the mall because I find it fun</div></output>
     <parseTree>
       <multi>
@@ -760,6 +976,18 @@
       "name": {"first": "Chris"},
       "company": "<b>GitHub</b>"
     } }'}</hash>
+    <hash compiler="xmlf">
+      <person>
+        <name><first>Chris</first></name>
+        <company><b>GitHub</b></company>
+      </person>
+    </hash>
+    <hash compiler="xmls">
+      <entry name="person">
+        <entry name="name"><entry name="first">Chris</entry></entry>
+        <entry name="company"><b>GitHub</b></entry>
+      </entry>
+    </hash>
     <output><div>Chris</div></output>
     <parseTree>
       <multi>
@@ -791,6 +1019,14 @@
   "tag1": "Tag 1",
   "tag2": "Tag 2"
 }'}</hash>
+    <hash compiler="xmlf">
+      <tag1>Tag 1</tag1>
+      <tag2>Tag 2</tag2>
+    </hash>
+    <hash compiler="xmls">
+      <entry name="tag1">Tag 1</entry>
+      <entry name="tag2">Tag 2</entry>
+    </hash>
     <output><div>Tag 1 is in normal angular brackets.
 
 Tag 2 is in ERB style.</div></output>
@@ -818,6 +1054,16 @@ Tag 2 is in ERB style.</div></output>
   "tag2": "Tag 2",
   "tag3": "Tag 3"
 }'}</hash>
+    <hash compiler="xmlf">
+      <tag1>Tag 1</tag1>
+      <tag2>Tag 2</tag2>
+      <tag3>Tag 3</tag3>
+    </hash>
+    <hash compiler="xmls">
+      <entry name="tag1">Tag 1</entry>
+      <entry name="tag2">Tag 2</entry>
+      <entry name="tag3">Tag 3</entry>
+    </hash>
     <output><div>Tag 1 is in normal angular brackets.
 
 Tag 2 is in ERB style.
@@ -849,6 +1095,18 @@ Tag 3 is in normal style again.</div></output>
 	  { "name": "Klaus" }
 	]}'}
     </hash>
+    <hash compiler="xmlf">
+      <names>
+        <name>Peter</name>
+      </names>
+      <names>
+        <name>Klaus</name>
+      </names>
+    </hash>
+    <hash compiler="xmls">
+      <entry name="names"><entry name="name">Peter</entry></entry>
+      <entry name="names"><entry name="name">Klaus</entry></entry>
+    </hash>
     <output><div><h2>Names</h2>
   <strong>Peter</strong>
   <strong>Klaus</strong>
@@ -869,6 +1127,18 @@ Tag 3 is in normal style again.</div></output>
 	  { "name": "Peter" },
 	  { "name": "Klaus" }
 	]}'}
+    </hash>
+    <hash compiler="xmlf">
+      <names>
+        <name>Peter</name>
+      </names>
+      <names>
+        <name>Klaus</name>
+      </names>
+    </hash>
+    <hash compiler="xmls">
+      <entry name="names"><entry name="name">Peter</entry></entry>
+      <entry name="names"><entry name="name">Klaus</entry></entry>
     </hash>
     <output><div><h2>Names</h2>
   <h1><strong>Peter</strong></h1>
@@ -977,6 +1247,8 @@ Tag 3 is in normal style again.</div></output>
       <test name="" section="">
         <template>{''}</template>
         <hash compiler="json">{''}</hash>
+        <hash compiler="xmlf"></hash>
+        <hash compiler="xmls"></hash>
         <output><div></div></output>
         <parseTree>
           <multi/>
