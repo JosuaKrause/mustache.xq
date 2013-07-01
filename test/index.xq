@@ -4,8 +4,6 @@ declare variable $dir := file:dir-name(static-base-uri()) || '/';
 
 declare variable $tests := xquery:invoke($dir || 'tests.xml');
 
-declare variable $compiler_types := ("json", "xmls", "xmlf");
-
 declare function local:summarize( $name, $nodes ) {
   let $parseTests       := count($nodes/@parseTest)
      ,$compileTests     := count($nodes/@compileTest)
@@ -40,9 +38,9 @@ declare function local:compiler-test($template, $hash, $output, $compiler_type) 
   })
 };
 
-declare function local:run-test($i, $test as node(), $compiler_type) as node()? {
-  let $template := $test/template/string()
-     ,$hash     := $test/hash[@compiler eq $compiler_type]
+declare function local:run-test($i, $test as node(), $hash) as node()? {
+  let $template       := $test/template/string()
+     ,$compiler_type  := $hash/@compiler
   return try {
     let $section        := $test/@section
        ,$parseTree      := $test/parseTree/*
@@ -55,7 +53,7 @@ declare function local:run-test($i, $test as node(), $compiler_type) as node()? 
        ,$validCompiler  := $compiled[1]
        ,$outputCompiler := $compiled[2]
     return
-      <test position="{$i}" parseTest="{if($valid) then 'ok' else 'NOK'}">
+      <test position="{$i}" parseTest="{if($valid) then 'ok' else 'NOK'}" compiler="{$compiler_type}">
         { $section, if($compilerTest) then attribute compileTest {if($validCompiler) then 'ok' else 'NOK'} else () }
         { string($test/@name) } 
         { if($valid)
@@ -81,7 +79,8 @@ declare function local:run-test($i, $test as node(), $compiler_type) as node()? 
         }
       </test>
   } catch * {
-    <test type="ERROR" i="{$err:code}"  parseTest="NOK" compileTest="NOK">{$test/@name}
+    <test type="ERROR" i="{$err:code}" parseTest="NOK" compileTest="NOK" compiler="{$compiler_type}">
+      {$test/@name}
  	   <stackTrace>{$err:description}</stackTrace>
  	   <template>{$template}</template>
 	    {$hash}
@@ -94,8 +93,8 @@ let $results :=
     for $test at $i in $tests/test
     order by $test/@section
     return
-      for $compiler_type in $compiler_types
-      return local:run-test($i, $test, $compiler_type)
+      for $hash in $test/hash
+      return local:run-test($i, $test, $hash)
 } </tests>
 return
   <result>

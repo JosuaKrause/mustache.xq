@@ -16,6 +16,8 @@
   <test name="Two mustaches With No Whitespace" section="whitespace">
     <template>{'{{word}}{{word}}!'}</template>
     <hash compiler="json">{'{"word": "la"}'}</hash>
+    <hash compiler="xmlf"><word>la</word></hash>
+    <hash compiler="xmls"><entry name="word">la</entry></hash>
     <output><div>lala!</div></output>
     <parseTree>
       <multi>
@@ -28,6 +30,8 @@
   <test name="Variables with embedded XQuery" section="etag">
     <template>{'x=4+5*2={{x}}'}</template>
     <hash compiler="json">{'{ "x": ' || ( xs:integer(4) + 5 ) * 2 || '}'}</hash>
+    <hash compiler="xmlf"><x>{ ( xs:integer(4) + 5 ) * 2 }</x></hash>
+    <hash compiler="xmls"><entry name="x">{ (xs:integer(4) + 5 ) * 2 }</entry></hash>
     <output><div>x=4+5*2=18</div></output>
     <parseTree>
       <multi>
@@ -45,6 +49,8 @@
       "name": "Chris",
       "company": "<b>GitHub</b>"
     }'}</hash>
+    <hash compiler="xmlf"><name>Chris</name><company><b>GitHub</b></company></hash>
+    <hash compiler="xmls"><entry name="name">Chris</entry><entry name="company"><b>GitHub</b></entry></hash>
     <output>
       <div>
         * Chris
@@ -69,6 +75,8 @@
   <test name="Simple Escaped Variables with {{&amp;var}}" section="utag">
     <template>{'{{&amp; name}}'}</template>
     <hash compiler="json">{'{"name":"<b>Pete Aven</b>"}'}</hash>
+    <hash compiler="xmlf"><name><b>Pete Aven</b></name></hash>
+    <hash compiler="xmls"><entry name="name"><b>Pete Aven</b></entry></hash>
     <output><div><b>Pete Aven</b></div></output>
     <parseTree>
       <multi>
@@ -766,6 +774,8 @@
   <test name="Not Found" section="complex">
     <template>{'{{foo}}'}</template>
     <hash compiler="json">{'{ "bar": "yo" }'}</hash>
+    <hash compiler="xmlf"><bar>yo</bar></hash>
+    <hash compiler="xmls"><entry name="bar">yo</entry></hash>
     <output><div/></output>
     <parseTree>
       <multi>
