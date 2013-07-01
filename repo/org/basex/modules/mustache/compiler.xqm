@@ -5,6 +5,8 @@ xquery version "3.0" ;
 
 module namespace compiler = "http://basex.org/modules/mustache/compiler";
 
+import module namespace parser = "http://basex.org/modules/mustache/parser" at 'parser.xqm';
+
 (:
  $compiler:
    unpath
@@ -145,12 +147,17 @@ declare function compiler:compile-node($node as element(), $map as element()*, $
              else if($bool)
                   then compiler:compile-intern($node, $map, $functions, $compiler)
                   else ()
+    (: inverted section :)
     case element(inverted-section) return
       let $cp   := $compiler("iter")($compiler("unpath")($map, $node/@name))
          ,$bool := $compiler("to_bool")($cp)
       return if(count($bool) = 0 or $bool)
              then ()
              else compiler:compile-intern($node, $map, $functions, $compiler)
+    (: partials :)
+    case element(partial) return
+      (: TODO specify own base path :)
+      compiler:compile-intern(parser:parse(file:read-text($node/@name)), $map, $functions, $compiler)
     (: function call :)
     case element(fun) return
       let $curPath := $compiler("unpath")($map, $node/@name)
@@ -161,32 +168,6 @@ declare function compiler:compile-node($node as element(), $map as element()*, $
     (: error :)
     default return
       compiler:error('001', 'invalid command', $node)
-  (:
-  typeswitch($node)
-    case element(section) return
-        let $sNode := compiler:unpath( string( $node/@name ) , $json, $pos, $xpath )
-        return 
-          if ( $sNode/@boolean = "true" or ( not( empty( tokenize( $json/@booleans, '\s')[.=$node/@name] ) ) and $sNode/text() = "true" ) )
-          then compiler:compile-xpath( $node, $json, $pos, $xpath )
-          else
-            if ( $sNode/@type = "array" or ( not( empty( tokenize( $json/@arrays, '\s')[.=$node/@name] ) ) ) )
-            then (
-              for $n at $p in $sNode/node()
-              return compiler:compile-xpath( $node, $json, $p, concat( $xpath, '/', node-name($sNode), '/value' ) ) )
-            else if($sNode/@type = "object" or ( not( empty( tokenize( $json/@objects, '\s')[.=$node/@name] ) ) ) ) then 
-            compiler:compile-xpath( $node, $json, $pos, concat( $xpath,'/', node-name( $sNode ) ) ) else ()
-    case element(partial) return compiler:compile-xpath(parser:parse(file:read-text($node/@name)), $json, $pos, $xpath)
-    case element(inverted-section) return
-      let $sNode := compiler:unpath( string( $node/@name ) , $json, $pos, $xpath )
-      return 
-        if ( $sNode/@boolean = "true" or ( not( empty( tokenize( $json/@booleans, '\s')[.=$node/@name] ) ) and $sNode/text() = "true" ) )
-        then ()
-        else if ( $sNode/@type = "array" or ( not( empty( tokenize( $json/@arrays, '\s')[.=$node/@name] ) ) ) )
-             then if (exists($sNode/node())) 
-             then () 
-             else compiler:compile-xpath( $node, $json )
-       else compiler:compile-xpath( $node, $json ) 
-    :)
 };
 
 declare function compiler:call($item as element(), $node as element(), $functions as map(*)) as xs:string* {
