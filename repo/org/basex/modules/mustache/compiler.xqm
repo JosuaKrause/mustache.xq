@@ -16,13 +16,15 @@ import module namespace parser = "http://basex.org/modules/mustache/parser" at '
    to_bool
    text
    xml
-   (eval)
  :)
 
 declare function compiler:strictXMLcompiler() as map(*) {
   map {
     "unpath" := function($map as element()*, $path as xs:string) as node()* {
       $map[@name=$path]
+    },
+    "desc" := function($map as element()*, $path as xs:string) as node()* {
+      $map//entry[@name=$path]
     },
     "init" := function($map as element()) as element()* {
       $map/entry
@@ -53,6 +55,9 @@ declare function compiler:freeXMLcompiler() as map(*) {
     "unpath" := function($map as element()*, $path as xs:string) as node()* {
       $map/node()[name() eq $path]
     },
+    "desc" := function($map as element()*, $path as xs:string) as node()* {
+      $map//node()[name() eq $path]
+    },
     "init" := function($map as element()) as element()* {
       $map
     },
@@ -82,6 +87,9 @@ declare function compiler:JSONcompiler() as map(*) {
     "unpath" := function($map as element()*, $path as xs:string) as node()* {
       $map/node()[name() eq $path]
     },
+    "desc" := function($map as element()*, $path as xs:string) as node()* {
+      $map//node()[name() eq $path]
+    },
     "init" := function($map as element()) as element()* {
       $map
     },
@@ -102,10 +110,6 @@ declare function compiler:JSONcompiler() as map(*) {
     "xml" := function($item as element()*) as xs:string* {
       for $i in $item
       return text { $i }
-    },
-    "eval" := function($item as element()*) as xs:string* {
-      for $i in xquery:eval( text { $item } )
-      return serialize($i)
     }
   }
 };
@@ -132,11 +136,11 @@ declare function compiler:compile-node($node as element(), $map as element()*, $
     (: unescaped substitution :)
     case element(utag) return
       $compiler("xml")($compiler("unpath")($map, $node/@name))
-    (: inline code :)
+    (: descendant substitution :)
     case element(rtag) return
-      if(map:contains($compiler, "eval"))
-      then $compiler("eval")($compiler("unpath")($map, $node/@name))
-      else compiler:error('002', 'no function for "eval"', $node)
+      let $cp := $compiler("desc")($map, $node/@name)
+      return for $curPath in $cp
+             return compiler:compile-intern($node, $compiler("next")($curPath), $functions, $compiler, $base-path)
     (: section :)
     case element(section) return
       let $cp   := $compiler("iter")($compiler("unpath")($map, $node/@name))
