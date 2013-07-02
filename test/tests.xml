@@ -124,8 +124,8 @@
     <hash compiler="json">{'{
       "person": true
     }'}</hash>
-    <hash comnpiler="xmlf"><person>true</person></hash>
-    <hash comnpiler="xmls"><entry name="person">true</entry></hash>
+    <hash compiler="xmlf"><person>true</person></hash>
+    <hash compiler="xmls"><entry name="person">true</entry></hash>
     <output><div>Shown.</div></output>
     <parseTree>
       <multi>
@@ -144,8 +144,8 @@
     <hash compiler="json">{'{
       "nothin": true
     }'}</hash>
-    <hash comnpiler="xmlf"><nothin>true</nothin></hash>
-    <hash comnpiler="xmls"><entry name="nothin">true</entry></hash>
+    <hash compiler="xmlf"><nothin>true</nothin></hash>
+    <hash compiler="xmls"><entry name="nothin">true</entry></hash>
     <output><div>Shown. Also shown!</div></output>
     <parseTree>
       <multi>
@@ -164,8 +164,8 @@
     <hash compiler="json">{'{
       "nothin": false
     }'}</hash>
-    <hash comnpiler="xmlf"><nothin>false</nothin></hash>
-    <hash comnpiler="xmls"><entry name="nothin">false</entry></hash>
+    <hash compiler="xmlf"><nothin>false</nothin></hash>
+    <hash compiler="xmls"><entry name="nothin">false</entry></hash>
     <output><div>Shown.</div></output>
     <parseTree>
       <multi>
@@ -184,8 +184,8 @@
     <hash compiler="json">{'{
       "nothin": []
     }'}</hash>
-    <hash comnpiler="xmlf"><nothin /></hash>
-    <hash comnpiler="xmls"><entry name="nothin" /></hash>
+    <hash compiler="xmlf"><nothin /></hash>
+    <hash compiler="xmls"><entry name="nothin" /></hash>
     <output><div>Shown.</div></output>
     <parseTree>
       <multi>

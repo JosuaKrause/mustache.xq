@@ -13,12 +13,12 @@ declare function mustache:parse($template as xs:string) as element() {
   parser:parse($template)
 };
 
-declare function mustache:compile($parseTree as element(), $input as xs:string, $inputParser as function(xs:string) as element(), $functions as map(*), $compiler as map(*)) as node()* {
-  mustache:compile($parseTree, $inputParser($input), $functions, $compiler)
+declare function mustache:compile($parseTree as element(), $map as element(), $functions as map(*), $compiler as map(*)) as node()* {
+  mustache:compile($parseTree, $map, $functions, $compiler, file:dir-name(static-base-uri()))
 };
 
-declare function mustache:compile($parseTree as element(), $map as element(), $functions as map(*), $compiler as map(*)) as node()* {
-  compiler:compile($parseTree, $map, $functions, $compiler)
+declare function mustache:compile($parseTree as element(), $map as element(), $functions as map(*), $compiler as map(*), $base-path as xs:string) as node()* {
+  compiler:compile($parseTree, $map, $functions, $compiler, $base-path)
 };
 
 declare function mustache:freeXMLcompiler() as map(*) {

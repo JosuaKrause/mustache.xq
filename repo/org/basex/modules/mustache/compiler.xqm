@@ -110,18 +110,18 @@ declare function compiler:JSONcompiler() as map(*) {
   }
 };
 
-declare function compiler:compile($parseTree as element(), $map as element(), $functions as map(*), $compiler as map(*)) as node()* {
-  let $strs := compiler:compile-intern($parseTree, $compiler("init")($map), $functions, $compiler)
+declare function compiler:compile($parseTree as element(), $map as element(), $functions as map(*), $compiler as map(*), $base-path as xs:string) as node()* {
+  let $strs := compiler:compile-intern($parseTree, $compiler("init")($map), $functions, $compiler, $base-path || '/')
      ,$text := string-join($strs, '')
   return parse-xml-fragment($text)
 };
 
-declare function compiler:compile-intern($parseTree as element(), $map as element()*, $functions as map(*), $compiler as map(*)) as xs:string* {
+declare function compiler:compile-intern($parseTree as element(), $map as element()*, $functions as map(*), $compiler as map(*), $base-path as xs:string) as xs:string* {
   for $node in $parseTree/node()
-  return compiler:compile-node($node, $map, $functions, $compiler)
+  return compiler:compile-node($node, $map, $functions, $compiler, $base-path)
 };
 
-declare function compiler:compile-node($node as element(), $map as element()*, $functions as map(*), $compiler as map(*)) as xs:string* {
+declare function compiler:compile-node($node as element(), $map as element()*, $functions as map(*), $compiler as map(*), $base-path as xs:string) as xs:string* {
   typeswitch($node)
     (: static text :)
     case element(static) return
@@ -143,9 +143,9 @@ declare function compiler:compile-node($node as element(), $map as element()*, $
          ,$bool := $compiler("to_bool")($cp)
       return if(count($bool) = 0)
              then for $curPath in $cp
-                  return compiler:compile-intern($node, $compiler("next")($curPath), $functions, $compiler)
+                  return compiler:compile-intern($node, $compiler("next")($curPath), $functions, $compiler, $base-path)
              else if($bool)
-                  then compiler:compile-intern($node, $map, $functions, $compiler)
+                  then compiler:compile-intern($node, $map, $functions, $compiler, $base-path)
                   else ()
     (: inverted section :)
     case element(inverted-section) return
@@ -153,11 +153,10 @@ declare function compiler:compile-node($node as element(), $map as element()*, $
          ,$bool := $compiler("to_bool")($cp)
       return if(count($bool) = 0 or $bool)
              then ()
-             else compiler:compile-intern($node, $map, $functions, $compiler)
+             else compiler:compile-intern($node, $map, $functions, $compiler, $base-path)
     (: partials :)
     case element(partial) return
-      (: TODO specify own base path :)
-      compiler:compile-intern(parser:parse(file:read-text($node/@name)), $map, $functions, $compiler)
+      compiler:compile-intern(parser:parse(file:read-text($base-path || $node/@name)), $map, $functions, $compiler, $base-path)
     (: function call :)
     case element(fun) return
       let $curPath := $compiler("unpath")($map, $node/@name)

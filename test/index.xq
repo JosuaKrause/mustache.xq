@@ -31,10 +31,11 @@ declare function local:parser-test($template, $parseTree) {
 
 declare function local:compiler-test($template, $hash, $output, $compiler_type) {
   xquery:invoke( $dir || 'run-compiler.xq', map{
-	'template' := $template,
-	'hash'     := $hash,
-	'output'   := $output,
-  'compiler' := $compiler_type
+	'template'  := $template,
+	'hash'      := $hash,
+	'output'    := $output,
+  'compiler'  := $compiler_type,
+  'base-path' := $dir
   })
 };
 
@@ -79,7 +80,7 @@ declare function local:run-test($i, $test as node(), $hash) as node()? {
         }
       </test>
   } catch * {
-    <test type="ERROR" i="{$err:code}" parseTest="NOK" compileTest="NOK" compiler="{$compiler_type}">
+    <test type="ERROR" code="{$err:code}" parseTest="NOK" compileTest="NOK" compiler="{$compiler_type}">
       {$test/@name}
  	   <stackTrace>{$err:description}</stackTrace>
  	   <template>{$template}</template>
