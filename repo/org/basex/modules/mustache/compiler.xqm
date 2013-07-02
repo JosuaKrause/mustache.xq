@@ -24,7 +24,7 @@ declare function compiler:strictXMLcompiler() as map(*) {
       $map[@name=$path]
     },
     "desc" := function($map as element()*, $path as xs:string) as node()* {
-      $map//entry[@name=$path]
+      $map/..//entry[@name=$path]
     },
     "init" := function($map as element()) as element()* {
       $map/entry
@@ -56,7 +56,7 @@ declare function compiler:freeXMLcompiler() as map(*) {
       $map/node()[name() eq $path]
     },
     "desc" := function($map as element()*, $path as xs:string) as node()* {
-      $map//node()[name() eq $path]
+      $map/..//node()[name() eq $path]
     },
     "init" := function($map as element()) as element()* {
       $map
@@ -88,7 +88,7 @@ declare function compiler:JSONcompiler() as map(*) {
       $map/node()[name() eq $path]
     },
     "desc" := function($map as element()*, $path as xs:string) as node()* {
-      $map//node()[name() eq $path]
+      $map/..//node()[name() eq $path]
     },
     "init" := function($map as element()) as element()* {
       $map
