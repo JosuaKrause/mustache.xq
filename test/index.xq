@@ -52,7 +52,8 @@ declare function local:run-test($i, $test as node(), $hash) as node()? {
        ,$compilerTest   := $hash and $output and $parseTree
        ,$compiled       := if($compilerTest) then local:compiler-test($template, $hash, $output, $compiler_type) else ()
        ,$validCompiler  := $compiled[1]
-       ,$outputCompiler := $compiled[2]
+       ,$outputCompiler := parse-xml-fragment($compiled[2])
+       ,$outputExpected := parse-xml-fragment($compiled[3])
     return
       <test position="{$i}" parseTest="{if($valid) then 'ok' else 'NOK'}" compiler="{$compiler_type}">
         { $section, if($compilerTest) then attribute compileTest {if($validCompiler) then 'ok' else 'NOK'} else () }
@@ -73,7 +74,7 @@ declare function local:run-test($i, $test as node(), $hash) as node()? {
                  <compileTestExplanation> 
                    <template>{$template}</template>
                    {$hash}
-                   <expected>{$output}</expected>
+                   <expected>{$outputExpected}</expected>
                    <got>{$outputCompiler}</got>
                  </compileTestExplanation>
           else ()

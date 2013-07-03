@@ -4,19 +4,34 @@ import module namespace mustache = "http://basex.org/modules/mustache/mustache" 
 
 let $mapStrict :=
       <root>
-        <entry name="array_of_strings">hello</entry>
-        <entry name="array_of_strings">world</entry>
+        <entry name="repo">
+          <entry name="name">resque</entry>
+        </entry>
+        <entry name="repo">
+          <entry name="name">hub</entry>
+        </entry>
+        <entry name="repo">
+          <entry name="name">rip</entry>
+        </entry>
       </root>,
     $mapFree :=
       <root>
-        <array_of_strings>hello</array_of_strings>
-        <array_of_strings>world</array_of_strings>
+        <repo>
+          <name>resque</name>
+        </repo>
+        <repo>
+          <name>hub</name>
+        </repo>
+        <repo>
+          <name>rip</name>
+        </repo>
       </root>,
     $mapJSON := '{
-      "array_of_strings": [
-      "hello",
-      "world"
-    ]
+      "repo": [
+        { "name": "resque" },
+        { "name": "hub" },
+        { "name": "rip" }
+      ]
     }',
     $functionsFree := map {
       "sum" := function($elem as element()) as xs:string {
@@ -33,7 +48,9 @@ let $mapStrict :=
         text { sum($elem/../map/value/foo/number()) }
       }
     },
-    $template := '{{#array_of_strings}} {{.}}! {{/array_of_strings}}'(:'{{^nothin}}foo{{/nothin}}{{#nothin}}bar{{/nothin}}':)
+    $template := '{{#repo}}
+    &lt;b&gt;{{name}}&lt;/b&gt;
+  {{/repo}}'
 return (
   element elem { mustache:compile(mustache:parse($template), $mapStrict, $functionsStrict, mustache:strictXMLcompiler()) },
   element free { mustache:compile(mustache:parse($template), $mapFree, $functionsFree, mustache:freeXMLcompiler()) },
