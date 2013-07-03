@@ -2,7 +2,7 @@ xquery version "3.0" ;
 
 declare variable $dir := file:dir-name(static-base-uri()) || '/';
 
-declare variable $tests := xquery:invoke($dir || 'tests.xml');
+declare variable $tests := xquery:invoke($dir || 'tests.xq');
 
 declare function local:summarize( $name, $nodes ) {
   let $parseTests       := count($nodes/@parseTest)
@@ -82,7 +82,7 @@ declare function local:run-test($i, $test as node(), $hash) as node()? {
   } catch * {
     <test type="ERROR" code="{$err:code}" parseTest="NOK" compileTest="NOK" compiler="{$compiler_type}">
       {$test/@name}
- 	   <stackTrace>{$err:description}</stackTrace>
+ 	   <description>{$err:description}</description>
  	   <template>{$template}</template>
 	    {$hash}
     </test>

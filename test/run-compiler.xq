@@ -31,6 +31,6 @@ let $compiled := mustache:compile(
         default return error(xs:QName("local:ERR001"), 'unknown compiler: ' || $compiler)
      ,$base-path
     )
-   ,$render   := local:canonicalize( document { element div { $compiled } } )
-   ,$output   := local:canonicalize( document { $output } )
+   ,$render   := local:canonicalize( element div { $compiled } )
+   ,$output   := local:canonicalize( $output )
 return (deep-equal($render, $output), $render)

@@ -4,55 +4,19 @@ import module namespace mustache = "http://basex.org/modules/mustache/mustache" 
 
 let $mapStrict :=
       <root>
-        <entry name="fun">sum</entry>
-        <entry name="map">
-          <entry name="foo">3</entry>
-        </entry>
-        <entry name="map">
-          <entry name="foo">7</entry>
-        </entry>
-        <entry name="map">
-          <entry name="foo">11</entry>
-        </entry>
-        <entry name="bar">
-          <entry name="baz">
-            <entry name="bar">hi</entry>
-          </entry>
-        </entry>
-        <entry name="lit"><b>lit</b></entry>
+        <entry name="array_of_strings">hello</entry>
+        <entry name="array_of_strings">world</entry>
       </root>,
     $mapFree :=
       <root>
-        <fun>sum</fun>
-        <map>
-          <foo>3</foo>
-        </map>
-        <map>
-          <foo>7</foo>
-        </map>
-        <map>
-          <foo>11</foo>
-        </map>
-        <bar>
-          <baz>
-            <bar>hi</bar>
-          </baz>
-        </bar>
-        <lit><b>lit</b></lit>
+        <array_of_strings>hello</array_of_strings>
+        <array_of_strings>world</array_of_strings>
       </root>,
     $mapJSON := '{
-      "fun": "sum",
-      "map": [
-        {"foo": 3},
-        {"foo": 7},
-        {"foo": 11}
-      ],
-      "bar": {
-        "baz": {
-          "bar": "hi"
-        }
-      },
-      "lit": "<b>lit</b>"
+      "array_of_strings": [
+      "hello",
+      "world"
+    ]
     }',
     $functionsFree := map {
       "sum" := function($elem as element()) as xs:string {
@@ -69,7 +33,7 @@ let $mapStrict :=
         text { sum($elem/../map/value/foo/number()) }
       }
     },
-    $template := '{{#map}}{{foo}}+{{/map}}={{:fun}}{{bar.baz.bar}}({{lit}},{{{lit}}})'
+    $template := '{{#array_of_strings}} {{.}}! {{/array_of_strings}}'(:'{{^nothin}}foo{{/nothin}}{{#nothin}}bar{{/nothin}}':)
 return (
   element elem { mustache:compile(mustache:parse($template), $mapStrict, $functionsStrict, mustache:strictXMLcompiler()) },
   element free { mustache:compile(mustache:parse($template), $mapFree, $functionsFree, mustache:freeXMLcompiler()) },

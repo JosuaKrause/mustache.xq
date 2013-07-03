@@ -248,7 +248,7 @@
     <output><div>hello! world!</div></output>
     <parseTree>
       <multi>
-        <section name="array__of__strings">
+        <section name="array_of_strings">
           <etag name="."/>
           <static>!</static>
         </section>
@@ -407,9 +407,9 @@
         <static>! You have just won $</static>
         <etag name="value"/>
         <static>!</static>
-        <section name="in__ca">
+        <section name="in_ca">
           <static>Well, $</static>
-          <etag name="taxed__value"/>
+          <etag name="taxed_value"/>
           <static>, after taxes.</static>
         </section>
       </multi>
@@ -499,7 +499,7 @@
         <entry name="name">Jan</entry>
       </entry>
     </hash>
-    <output><div>* Chris Jan</div></output>
+    <output><div>* ChrisJan</div></output>
     <parseTree>
       <multi>
         <static>*</static>
@@ -526,7 +526,7 @@
         <entry name="name">Jan</entry>
       </entry>
     </hash>
-    <output><div>* Chris Kelly</div></output>
+    <output><div>* ChrisKelly</div></output>
     <parseTree>
       <multi>
         <static>*</static>
@@ -789,7 +789,7 @@
         </entry>
       </entry>
     </hash>
-    <output><div><h1>this is an object</h1>
+    <output><div> <h1>this is an object</h1>
       <p>one of its attributes is a list</p>
       <ul>
             <li>listitem1</li>
@@ -797,13 +797,13 @@
         </ul></div></output>
     <parseTree>
       <multi>
-        <section name="a__object">
+        <section name="a_object">
           <static>&lt;h1&gt;</static>
           <etag name="title"/>
           <static>&lt;/h1&gt; &lt;p&gt;</static>
           <etag name="description"/>
           <static>&lt;/p&gt; &lt;ul&gt;</static>
-          <section name="a__list">
+          <section name="a_list">
             <static>&lt;li&gt;</static>
             <etag name="label"/>
             <static>&lt;/li&gt;</static>
