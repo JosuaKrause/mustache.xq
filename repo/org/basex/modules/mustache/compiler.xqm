@@ -71,14 +71,14 @@ declare function compiler:freeXMLcompiler() as map(*) {
       $map
     },
     "iter" := function($el as element()*) as node()* {
-      $el/node()
+      $el
     },
     "next" := function($path as node()*) as node()* {
       typeswitch($path)
       case text() return
         $path
       default return
-        element root {$path}
+        element root { $path/node() }
     },
     "text" := function($item as node()*) as xs:string* {
       for $i in $item
@@ -153,7 +153,7 @@ declare function compiler:unpath($map as node()*, $path as xs:string, $compiler 
 declare function compiler:compile($parseTree as element(), $map as element(), $functions as map(*), $compiler as map(*), $base-path as xs:string) as node()* {
   let $strs := compiler:compile-intern($parseTree, $compiler("init")($map), $functions, $compiler, $base-path || '/')
      ,$text := string-join($strs)
-  return trace(parse-xml-fragment(normalize-space($text)), "###")
+  return parse-xml-fragment(normalize-space($text))
 };
 
 declare function compiler:compile-intern($parseTree as element(), $map as node()*, $functions as map(*), $compiler as map(*), $base-path as xs:string) as xs:string* {
