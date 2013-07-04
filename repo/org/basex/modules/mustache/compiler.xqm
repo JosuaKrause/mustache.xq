@@ -150,10 +150,10 @@ declare function compiler:unpath($map as node()*, $path as xs:string, $compiler 
   else $compiler("unpath")($map, $path)
 };
 
-declare function compiler:compile($parseTree as element(), $map as element(), $functions as map(*), $compiler as map(*), $base-path as xs:string) as node()* {
+declare function compiler:compile($parseTree as element(), $map as element(), $functions as map(*), $compiler as map(*), $base-path as xs:string) as xs:string {
   let $strs := compiler:compile-intern($parseTree, $compiler("init")($map), $functions, $compiler, $base-path || '/')
      ,$text := string-join($strs)
-  return parse-xml-fragment(normalize-space($text))
+  return normalize-space($text)
 };
 
 declare function compiler:compile-intern($parseTree as element(), $map as node()*, $functions as map(*), $compiler as map(*), $base-path as xs:string) as xs:string* {
@@ -203,7 +203,7 @@ declare function compiler:compile-node($node as element(), $map as node()*, $fun
       compiler:compile-intern(parser:parse(file:read-text($base-path || $name)), $map, $functions, $compiler, $base-path)
     (: function call :)
     case element(fun) return
-      compiler:call($name, $map, $functions)
+      compiler:call($name, $map, $functions, $compiler)
     (: comment :)
     case element(comment) return
       ()
@@ -212,8 +212,20 @@ declare function compiler:compile-node($node as element(), $map as node()*, $fun
       compiler:error('001', 'invalid command', $node)
 };
 
-declare function compiler:call($item as xs:string, $node as element(), $functions as map(*)) as xs:string* {
-  $functions($item)($node)
+declare function compiler:call($item as xs:string, $node as node()*, $functions as map(*), $compiler as map(*)) as xs:string* {
+  let $f := $functions($item)
+  return
+    typeswitch($f)
+    case function(*) return
+      serialize($f(
+        $node,
+        function($node as node()*, $name as xs:string) as node()* {
+          for $c in $compiler("iter")(compiler:unpath($node, $name, $compiler))
+          return $compiler("next")($c)
+        }
+      ))
+    default return
+      error(xs:QName("compiler:ERR003"), 'unknown function: ' || $item)
 };
 
 declare function compiler:error($num as xs:string, $str as xs:string, $node as element()) as xs:string* {

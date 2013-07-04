@@ -18,6 +18,14 @@ declare function mustache:compile($parseTree as element(), $map as element(), $f
 };
 
 declare function mustache:compile($parseTree as element(), $map as element(), $functions as map(*), $compiler as map(*), $base-path as xs:string) as node()* {
+  parse-xml-fragment(mustache:compile-plain($parseTree, $map, $functions, $compiler, $base-path))
+};
+
+declare function mustache:compile-plain($parseTree as element(), $map as element(), $functions as map(*), $compiler as map(*)) as xs:string {
+  mustache:compile-plain($parseTree, $map, $functions, $compiler, file:dir-name(static-base-uri()))
+};
+
+declare function mustache:compile-plain($parseTree as element(), $map as element(), $functions as map(*), $compiler as map(*), $base-path as xs:string) as xs:string {
   compiler:compile($parseTree, $map, $functions, $compiler, $base-path)
 };
 
