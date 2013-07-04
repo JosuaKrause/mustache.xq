@@ -8,15 +8,26 @@ module namespace compiler = "http://basex.org/modules/mustache/compiler";
 import module namespace parser = "http://basex.org/modules/mustache/parser" at 'parser.xqm';
 
 (:
- $compiler:
-   unpath
-   init
-   iter
-   next
-   text
-   xml
+  The following methods must be given when writing an compiler:
+   "unpath" := function($map as element()*, $path as xs:string) as element()*
+     Follows one step ($path) down the input ($map)
+   "desc" := function($map as element()*, $path as xs:string) as element()*
+     Gets all descending elements named $path of $map
+   "init" := function($map as element()) as element()*
+     Initializes the input ($map)
+   "iter" := function($el as element()*) as node()*
+     Iterates over elements ($el)
+   "next" := function($path as node()*) as node()*
+     Gets the next element in $path
+   "text" := function($item as node()*) as xs:string*
+     Converts $item to an escaped string
+   "xml" := function($item as node()*) as xs:string*
+     Converts $item to an unescaped string
  :)
 
+(:~
+ : @return The compiler for xmls consisting of elements with the name entry and the attribute name which is the name for the element.
+ :)
 declare function compiler:strictXMLcompiler() as map(*) {
   map {
     "unpath" := function($map as element()*, $path as xs:string) as element()* {
@@ -59,6 +70,9 @@ declare function compiler:strictXMLcompiler() as map(*) {
   }
 };
 
+(:~
+ : @return The compiler without a forced xml structure.
+ :)
 declare function compiler:freeXMLcompiler() as map(*) {
   map {
     "unpath" := function($map as element()*, $path as xs:string) as element()* {
@@ -101,6 +115,9 @@ declare function compiler:freeXMLcompiler() as map(*) {
   }
 };
 
+(:~
+ : @return The compiler for JSON input. Note that the input must be compiled with json:parse first.
+ :)
 declare function compiler:JSONcompiler() as map(*) {
   map {
     "unpath" := function($map as element()*, $path as xs:string) as element()* {
@@ -135,6 +152,11 @@ declare variable $compiler:NOTHING    := 0;
 declare variable $compiler:JUST_TRUE  := 1;
 declare variable $compiler:JUST_FALSE := 2;
 
+(:~
+ : Decides whether an element is to be considered boolean.
+ : @param The string representation of the item.
+ : @return One of $compiler:NOTHING, $compiler:JUST_TRUE, or $compiler:JUST_FALSE
+ :)
 declare function compiler:to_bool($el as xs:string*) as xs:integer {
   let $t := lower-case(normalize-space(string-join($el)))
   return if(string-length($t) = 0 or $t = "false")
@@ -144,23 +166,57 @@ declare function compiler:to_bool($el as xs:string*) as xs:integer {
          else $compiler:NOTHING
 };
 
+(:~
+ : Steps one element down.
+ : @param $map The input.
+ : @param $path The step.
+ : @param $compiler The current compiler.
+ : @return The new input.
+ :)
 declare function compiler:unpath($map as node()*, $path as xs:string, $compiler as map(*)) as node()* {
   if($path = ".")
   then $map
   else $compiler("unpath")($map, $path)
 };
 
+(:~
+ : Compiles a template to a string representation.
+ : @param $parseTree The template in internal representation.
+ : @param $map The input in its representation form.
+ : @param $functions A map of function names to functions.
+ : @param $compiler The compiler that will be used.
+ : @param $base-path The base path for partials.
+ : @return The result.
+ :)
 declare function compiler:compile($parseTree as element(), $map as element(), $functions as map(*), $compiler as map(*), $base-path as xs:string) as xs:string {
   let $strs := compiler:compile-intern($parseTree, $compiler("init")($map), $functions, $compiler, $base-path || '/')
      ,$text := string-join($strs)
   return $text
 };
 
+(:~
+ : Compiles a template to a string representation with initialized input.
+ : @param $parseTree The template in internal representation.
+ : @param $map The initialized input in its representation form.
+ : @param $functions A map of function names to functions.
+ : @param $compiler The compiler that will be used.
+ : @param $base-path The base path for partials.
+ : @return The result.
+ :)
 declare function compiler:compile-intern($parseTree as element(), $map as node()*, $functions as map(*), $compiler as map(*), $base-path as xs:string) as xs:string* {
   for $node in $parseTree/node()
   return compiler:compile-node($node, $map, $functions, $compiler, $base-path)
 };
 
+(:~
+ : Compiles a template node to a string representation.
+ : @param $parseTree The template in internal representation.
+ : @param $map The input in its representation form.
+ : @param $functions A map of function names to functions.
+ : @param $compiler The compiler that will be used.
+ : @param $base-path The base path for partials.
+ : @return The result.
+ :)
 declare function compiler:compile-node($node as element(), $map as node()*, $functions as map(*), $compiler as map(*), $base-path as xs:string) as xs:string* {
   let $name := $node/@name
   return typeswitch($node)
@@ -212,6 +268,14 @@ declare function compiler:compile-node($node as element(), $map as node()*, $fun
       compiler:error('001', 'invalid command', $node)
 };
 
+(:~
+ : Calls a function given by the map.
+ : The function gets two arguments, the current input context and a function (context, name) to step down context.
+ : @param $item The function.
+ : @param $node The context.
+ : @param $functions The functions.
+ : @param $compiler The current compiler.
+ :)
 declare function compiler:call($item as xs:string, $node as node()*, $functions as map(*), $compiler as map(*)) as xs:string* {
   let $f := $functions($item)
   return
@@ -228,6 +292,12 @@ declare function compiler:call($item as xs:string, $node as node()*, $functions 
       error(xs:QName("compiler:ERR003"), 'unknown function: ' || $item)
 };
 
+(:~
+ : Is called when an error occurs.
+ : @param $num The error code.
+ : @param $str The message.
+ : @param $node The affected template node.
+ :)
 declare function compiler:error($num as xs:string, $str as xs:string, $node as element()) as xs:string* {
   error(xs:QName("compiler:ERR" || $num), $str || ' ' || name($node) || '(' || $node/@name || ') "' || $node/@value || '"')
 };
