@@ -153,7 +153,7 @@ declare function compiler:unpath($map as node()*, $path as xs:string, $compiler 
 declare function compiler:compile($parseTree as element(), $map as element(), $functions as map(*), $compiler as map(*), $base-path as xs:string) as xs:string {
   let $strs := compiler:compile-intern($parseTree, $compiler("init")($map), $functions, $compiler, $base-path || '/')
      ,$text := string-join($strs)
-  return normalize-space($text)
+  return $text
 };
 
 declare function compiler:compile-intern($parseTree as element(), $map as node()*, $functions as map(*), $compiler as map(*), $base-path as xs:string) as xs:string* {
