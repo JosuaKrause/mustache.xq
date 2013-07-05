@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <title>Search -- {{query}}</title>
+  <style>
+    .result {
+        border-top: solid thick black;
+        clear: both;
+        width: 100%;
+    }
+    
+    .line {
+        width: 50%;
+        float: left;
+        text-align: center;
+        vertical-align: center;
+    }
+    
+    .context {
+        float: left;
+        vertical-align: center;
+    }
+  </style>
+</head>
+<body>
+  <strong>{{query}}</strong> with {{ctx}} lines of context.
+  <a href="../csv/">[csv]</a>
+  <br>
+  Found {{:count}} matches:<br><br>
+  {{#matches}}
+  <div class="result">
+    <div class="line">{{line}}</div>
+    <div class="context">
+      {{#before}}
+      {{.}}<br>
+      {{/before}}
+      <strong>{{line}}</strong><br>
+      {{#after}}
+      {{.}}<br>
+      {{/after}}
+    </div>
+  </div>
+  {{/matches}}
+</body>
+</html>
