@@ -1,5 +1,10 @@
 # mustache.xq Changes
 
+## 0.3
+
+* Alternative forms of input (hashs)
+* Function syntax
+
 ## 0.2.1
 
 * Works with BaseX
@@ -19,4 +24,4 @@
 * Variables with embedded XQuery
 * Dot Notation
 * Descendant Variable
-* Functional Tests
+* Functioning Tests

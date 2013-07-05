@@ -1,5 +1,6 @@
 (:~
  : This module showcases the usage of mustache.xq with REST-XQ.
+ : Note that the output from the "backend" is fixed to make the code easier to read.
  :
  : @author Joschi <josua.krause@gmail.com>
  :)
@@ -15,6 +16,13 @@ declare variable $page:result_tmpl := "{{> result.tmpl}}";
 declare variable $page:csv_tmpl    := "{{> csv.tmpl}}";
 
 declare variable $page:functions := map {
+  (:~
+   : Functions, like this, that are called from within mustache.xq must take two arguments.
+   : @param $node The current context of the mustache.xq engine.
+   : @param $get A function that allows to traverse the context further.
+   :   It takes two arguments, the first one is the context to traverse from, and the
+   :   second is the name of the elements to traverse.
+   :)
   "count" := function($node as node()*, $get as function(node()*, xs:string) as node()*) as xs:integer {
     count($get($node, "matches"))
   }

@@ -6,6 +6,7 @@
 
 BaseX specific:
 * [Dirk][7] Kirsten
+* [Josua][8] Krause
 
 [1]: http://github.com/dscape
 [2]: http://github.com/jpcs
@@ -14,3 +15,4 @@ BaseX specific:
 [5]: http://twitter.com/jpcs
 [6]: http://twitter.com/isubiker
 [7]: http://github.com/dirkk
+[8]: https://github.com/JosuaKrause
