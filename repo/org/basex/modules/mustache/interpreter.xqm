@@ -3,12 +3,13 @@
 :)
 xquery version "3.0" ;
 
-module namespace compiler = "http://basex.org/modules/mustache/compiler";
+module namespace interpreter = "http://basex.org/modules/mustache/interpreter";
 
+(: used only for parsing partials :)
 import module namespace parser = "http://basex.org/modules/mustache/parser" at 'parser.xqm';
 
 (:
-  The following methods must be given when writing an compiler:
+  The following methods must be given when writing an interpreter:
    "unpath" := function($map as element()*, $path as xs:string) as element()*
      Follows one step ($path) down the input ($map)
    "desc" := function($map as element()*, $path as xs:string) as element()*
@@ -26,9 +27,9 @@ import module namespace parser = "http://basex.org/modules/mustache/parser" at '
  :)
 
 (:~
- : @return The compiler for xmls consisting of elements with the name entry and the attribute name which is the name for the element.
+ : @return The interpreter for xmls consisting of elements with the name entry and the attribute name which is the name for the element.
  :)
-declare function compiler:strictXMLcompiler() as map(*) {
+declare function interpreter:strictXMLinterpreter() as map(*) {
   map {
     "unpath" := function($map as element()*, $path as xs:string) as element()* {
       $map[name()="entry" and @name=$path]
@@ -71,9 +72,9 @@ declare function compiler:strictXMLcompiler() as map(*) {
 };
 
 (:~
- : @return The compiler without a forced xml structure.
+ : @return The interpreter without a forced xml structure.
  :)
-declare function compiler:freeXMLcompiler() as map(*) {
+declare function interpreter:freeXMLinterpreter() as map(*) {
   map {
     "unpath" := function($map as element()*, $path as xs:string) as element()* {
       $map/node()[name() eq $path]
@@ -116,9 +117,9 @@ declare function compiler:freeXMLcompiler() as map(*) {
 };
 
 (:~
- : @return The compiler for JSON input. Note that the input must be compiled with json:parse first.
+ : @return The interpreter for JSON input. Note that the input must be converted with json:parse first.
  :)
-declare function compiler:JSONcompiler() as map(*) {
+declare function interpreter:JSONinterpreter() as map(*) {
   map {
     "unpath" := function($map as element()*, $path as xs:string) as element()* {
       let $p := fn:replace($path, "([^_]?)_([^_]?)", "$1__$2")
@@ -148,76 +149,76 @@ declare function compiler:JSONcompiler() as map(*) {
   }
 };
 
-declare variable $compiler:NOTHING    := 0;
-declare variable $compiler:JUST_TRUE  := 1;
-declare variable $compiler:JUST_FALSE := 2;
+declare variable $interpreter:NOTHING    := 0;
+declare variable $interpreter:JUST_TRUE  := 1;
+declare variable $interpreter:JUST_FALSE := 2;
 
 (:~
  : Decides whether an element is to be considered boolean.
  : @param The string representation of the item.
- : @return One of $compiler:NOTHING, $compiler:JUST_TRUE, or $compiler:JUST_FALSE
+ : @return One of $interpreter:NOTHING, $interpreter:JUST_TRUE, or $interpreter:JUST_FALSE
  :)
-declare function compiler:to_bool($el as xs:string*) as xs:integer {
+declare function interpreter:to_bool($el as xs:string*) as xs:integer {
   let $t := lower-case(normalize-space(string-join($el)))
   return if(string-length($t) = 0 or $t = "false")
-         then $compiler:JUST_FALSE
+         then $interpreter:JUST_FALSE
          else if($t = "true")
-         then $compiler:JUST_TRUE
-         else $compiler:NOTHING
+         then $interpreter:JUST_TRUE
+         else $interpreter:NOTHING
 };
 
 (:~
  : Steps one element down.
  : @param $map The input.
  : @param $path The step.
- : @param $compiler The current compiler.
+ : @param $interpreter The current interpreter.
  : @return The new input.
  :)
-declare function compiler:unpath($map as node()*, $path as xs:string, $compiler as map(*)) as node()* {
+declare function interpreter:unpath($map as node()*, $path as xs:string, $interpreter as map(*)) as node()* {
   if($path = ".")
   then $map
-  else $compiler("unpath")($map, $path)
+  else $interpreter("unpath")($map, $path)
 };
 
 (:~
- : Compiles a template to a string representation.
+ : Interprets a template to a string representation.
  : @param $parseTree The template in internal representation.
  : @param $map The input in its representation form.
  : @param $functions A map of function names to functions.
- : @param $compiler The compiler that will be used.
+ : @param $interpreter The interpreter that will be used.
  : @param $base-path The base path for partials.
  : @return The result.
  :)
-declare function compiler:compile($parseTree as element(), $map as element(), $functions as map(*), $compiler as map(*), $base-path as xs:string) as xs:string {
-  let $strs := compiler:compile-intern($parseTree, $compiler("init")($map), $functions, $compiler, $base-path || '/')
+declare function interpreter:interpret($parseTree as element(), $map as element(), $functions as map(*), $interpreter as map(*), $base-path as xs:string) as xs:string {
+  let $strs := interpreter:interpret-intern($parseTree, $interpreter("init")($map), $functions, $interpreter, $base-path || '/')
      ,$text := string-join($strs)
   return $text
 };
 
 (:~
- : Compiles a template to a string representation with initialized input.
+ : Interprets a template to a string representation with initialized input.
  : @param $parseTree The template in internal representation.
  : @param $map The initialized input in its representation form.
  : @param $functions A map of function names to functions.
- : @param $compiler The compiler that will be used.
+ : @param $interpreter The interpreter that will be used.
  : @param $base-path The base path for partials.
  : @return The result.
  :)
-declare function compiler:compile-intern($parseTree as element(), $map as node()*, $functions as map(*), $compiler as map(*), $base-path as xs:string) as xs:string* {
+declare function interpreter:interpret-intern($parseTree as element(), $map as node()*, $functions as map(*), $interpreter as map(*), $base-path as xs:string) as xs:string* {
   for $node in $parseTree/node()
-  return compiler:compile-node($node, $map, $functions, $compiler, $base-path)
+  return interpreter:interpret-node($node, $map, $functions, $interpreter, $base-path)
 };
 
 (:~
- : Compiles a template node to a string representation.
+ : Interprets a template node to a string representation.
  : @param $parseTree The template in internal representation.
  : @param $map The input in its representation form.
  : @param $functions A map of function names to functions.
- : @param $compiler The compiler that will be used.
+ : @param $interpreter The interpreter that will be used.
  : @param $base-path The base path for partials.
  : @return The result.
  :)
-declare function compiler:compile-node($node as element(), $map as node()*, $functions as map(*), $compiler as map(*), $base-path as xs:string) as xs:string* {
+declare function interpreter:interpret-node($node as element(), $map as node()*, $functions as map(*), $interpreter as map(*), $base-path as xs:string) as xs:string* {
   let $name := $node/@name
   return typeswitch($node)
     (: static text :)
@@ -225,47 +226,47 @@ declare function compiler:compile-node($node as element(), $map as node()*, $fun
       string($node/text())
     (: normal substitution :)
     case element(etag) return
-      $compiler("text")(compiler:unpath($map, $name, $compiler))
+      $interpreter("text")(interpreter:unpath($map, $name, $interpreter))
     (: unescaped substitution :)
     case element(utag) return
-      $compiler("xml")(compiler:unpath($map, $name, $compiler))
+      $interpreter("xml")(interpreter:unpath($map, $name, $interpreter))
     (: descendant substitution :)
     case element(rtag) return
-      for $curPath in $compiler("desc")($map, $name)
-      return $compiler("text")($curPath)
+      for $curPath in $interpreter("desc")($map, $name)
+      return $interpreter("text")($curPath)
     (: section :)
     case element(section) return
-      let $cp   := compiler:unpath($map, $name, $compiler)
-         ,$bool := compiler:to_bool(string-join($compiler("text")($cp)))
+      let $cp   := interpreter:unpath($map, $name, $interpreter)
+         ,$bool := interpreter:to_bool(string-join($interpreter("text")($cp)))
       return switch($bool)
-             case $compiler:JUST_TRUE return
-               compiler:compile-intern($node, $map, $functions, $compiler, $base-path)
-             case $compiler:JUST_FALSE return
+             case $interpreter:JUST_TRUE return
+               interpreter:interpret-intern($node, $map, $functions, $interpreter, $base-path)
+             case $interpreter:JUST_FALSE return
                ()
              default return
-               for $c in $compiler("iter")($cp)
-               return compiler:compile-intern($node, $compiler("next")($c), $functions, $compiler, $base-path)
+               for $c in $interpreter("iter")($cp)
+               return interpreter:interpret-intern($node, $interpreter("next")($c), $functions, $interpreter, $base-path)
     (: inverted section :)
     case element(inverted-section) return
-      let $cp   := compiler:unpath($map, $name, $compiler)
-         ,$bool := compiler:to_bool($compiler("text")($cp))
+      let $cp   := interpreter:unpath($map, $name, $interpreter)
+         ,$bool := interpreter:to_bool($interpreter("text")($cp))
       return switch($bool)
-             case $compiler:JUST_FALSE return
-               compiler:compile-intern($node, $map, $functions, $compiler, $base-path)
+             case $interpreter:JUST_FALSE return
+               interpreter:interpret-intern($node, $map, $functions, $interpreter, $base-path)
              default return
                ()
     (: partials :)
     case element(partial) return
-      compiler:compile-intern(parser:parse(file:read-text($base-path || $name)), $map, $functions, $compiler, $base-path)
+      interpreter:interpret-intern(parser:parse(file:read-text($base-path || $name)), $map, $functions, $interpreter, $base-path)
     (: function call :)
     case element(fun) return
-      compiler:call($name, $map, $functions, $compiler)
+      interpreter:call($name, $map, $functions, $interpreter)
     (: comment :)
     case element(comment) return
       ()
     (: error :)
     default return
-      compiler:error('001', 'invalid command', $node)
+      interpreter:error('001', 'invalid command', $node)
 };
 
 (:~
@@ -274,9 +275,9 @@ declare function compiler:compile-node($node as element(), $map as node()*, $fun
  : @param $item The function.
  : @param $node The context.
  : @param $functions The functions.
- : @param $compiler The current compiler.
+ : @param $interpreter The current interpreter.
  :)
-declare function compiler:call($item as xs:string, $node as node()*, $functions as map(*), $compiler as map(*)) as xs:string* {
+declare function interpreter:call($item as xs:string, $node as node()*, $functions as map(*), $interpreter as map(*)) as xs:string* {
   let $f := $functions($item)
   return
     typeswitch($f)
@@ -284,12 +285,12 @@ declare function compiler:call($item as xs:string, $node as node()*, $functions 
       serialize($f(
         $node,
         function($node as node()*, $name as xs:string) as node()* {
-          for $c in $compiler("iter")(compiler:unpath($node, $name, $compiler))
-          return $compiler("next")($c)
+          for $c in $interpreter("iter")(interpreter:unpath($node, $name, $interpreter))
+          return $interpreter("next")($c)
         }
       ))
     default return
-      error(xs:QName("compiler:ERR003"), 'unknown function: ' || $item)
+      error(xs:QName("interpreter:ERR003"), 'unknown function: ' || $item)
 };
 
 (:~
@@ -298,6 +299,6 @@ declare function compiler:call($item as xs:string, $node as node()*, $functions 
  : @param $str The message.
  : @param $node The affected template node.
  :)
-declare function compiler:error($num as xs:string, $str as xs:string, $node as element()) as xs:string* {
-  error(xs:QName("compiler:ERR" || $num), $str || ' ' || name($node) || '(' || $node/@name || ') "' || $node/@value || '"')
+declare function interpreter:error($num as xs:string, $str as xs:string, $node as element()) as xs:string* {
+  error(xs:QName("interpreter:ERR" || $num), $str || ' ' || name($node) || '(' || $node/@name || ') "' || $node/@value || '"')
 };

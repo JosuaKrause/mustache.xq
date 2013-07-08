@@ -7,7 +7,7 @@ xquery version "3.0" ;
 module namespace mustache = "http://basex.org/modules/mustache/mustache";
 
 import module namespace parser = "http://basex.org/modules/mustache/parser" at 'parser.xqm';
-import module namespace compiler = "http://basex.org/modules/mustache/compiler" at 'compiler.xqm';
+import module namespace interpreter = "http://basex.org/modules/mustache/interpreter" at 'interpreter.xqm';
 
 (:~
  : Parses the template.
@@ -19,72 +19,72 @@ declare function mustache:parse($template as xs:string) as element() {
 };
 
 (:~
- : Compiles a template to an xml representation. The folder of this file is used as base path.
+ : Interprets a template to an xml representation. The folder of this file is used as base path.
  : @param $parseTree The template in internal representation.
  : @param $map The input in its representation form.
  : @param $functions A map of function names to functions.
- : @param $compiler The compiler that will be used.
+ : @param $interpreter The interpreter that will be used.
  : @return The result.
  :)
-declare function mustache:compile($parseTree as element(), $map as element(), $functions as map(*), $compiler as map(*)) as node()* {
-  mustache:compile($parseTree, $map, $functions, $compiler, file:dir-name(static-base-uri()))
+declare function mustache:interpret($parseTree as element(), $map as element(), $functions as map(*), $interpreter as map(*)) as node()* {
+  mustache:interpret($parseTree, $map, $functions, $interpreter, file:dir-name(static-base-uri()))
 };
 
 (:~
- : Compiles a template to an xml representation.
+ : Interprets a template to an xml representation.
  : @param $parseTree The template in internal representation.
  : @param $map The input in its representation form.
  : @param $functions A map of function names to functions.
- : @param $compiler The compiler that will be used.
+ : @param $interpreter The interpreter that will be used.
  : @param $base-path The base path for partials.
  : @return The result.
  :)
-declare function mustache:compile($parseTree as element(), $map as element(), $functions as map(*), $compiler as map(*), $base-path as xs:string) as node()* {
-  parse-xml-fragment(normalize-space(mustache:compile-plain($parseTree, $map, $functions, $compiler, $base-path)))
+declare function mustache:interpret($parseTree as element(), $map as element(), $functions as map(*), $interpreter as map(*), $base-path as xs:string) as node()* {
+  parse-xml-fragment(normalize-space(mustache:interpret-plain($parseTree, $map, $functions, $interpreter, $base-path)))
 };
 
 (:~
- : Compiles a template to a string representation. The folder of this file is used as base path.
+ : Interprets a template to a string representation. The folder of this file is used as base path.
  : @param $parseTree The template in internal representation.
  : @param $map The input in its representation form.
  : @param $functions A map of function names to functions.
- : @param $compiler The compiler that will be used.
+ : @param $interpreter The interpreter that will be used.
  : @return The result.
  :)
-declare function mustache:compile-plain($parseTree as element(), $map as element(), $functions as map(*), $compiler as map(*)) as xs:string {
-  mustache:compile-plain($parseTree, $map, $functions, $compiler, file:dir-name(static-base-uri()))
+declare function mustache:interpret-plain($parseTree as element(), $map as element(), $functions as map(*), $interpreter as map(*)) as xs:string {
+  mustache:interpret-plain($parseTree, $map, $functions, $interpreter, file:dir-name(static-base-uri()))
 };
 
 (:~
- : Compiles a template to a string representation.
+ : Interprets a template to a string representation.
  : @param $parseTree The template in internal representation.
  : @param $map The input in its representation form.
  : @param $functions A map of function names to functions.
- : @param $compiler The compiler that will be used.
+ : @param $interpreter The interpreter that will be used.
  : @param $base-path The base path for partials.
  : @return The result.
  :)
-declare function mustache:compile-plain($parseTree as element(), $map as element(), $functions as map(*), $compiler as map(*), $base-path as xs:string) as xs:string {
-  compiler:compile($parseTree, $map, $functions, $compiler, $base-path)
+declare function mustache:interpret-plain($parseTree as element(), $map as element(), $functions as map(*), $interpreter as map(*), $base-path as xs:string) as xs:string {
+  interpreter:interpret($parseTree, $map, $functions, $interpreter, $base-path)
 };
 
 (:~
- : @return The compiler without a forced xml structure.
+ : @return The interpreter without a forced xml structure.
  :)
-declare function mustache:freeXMLcompiler() as map(*) {
-  compiler:freeXMLcompiler()
+declare function mustache:freeXMLinterpreter() as map(*) {
+  interpreter:freeXMLinterpreter()
 };
 
 (:~
- : @return The compiler for xmls consisting of elements with the name entry and the attribute name which is the name for the element.
+ : @return The interpreter for xmls consisting of elements with the name entry and the attribute name which is the name of the element.
  :)
-declare function mustache:strictXMLcompiler() as map(*) {
-  compiler:strictXMLcompiler()
+declare function mustache:strictXMLinterpreter() as map(*) {
+  interpreter:strictXMLinterpreter()
 };
 
 (:~
- : @return The compiler for JSON input. Note that the input must be compiled with json:parse first.
+ : @return The interpreter for JSON input. Note that the input must be converted with json:parse first.
  :)
-declare function mustache:JSONcompiler() as map(*) {
-  compiler:JSONcompiler()
+declare function mustache:JSONinterpreter() as map(*) {
+  interpreter:JSONinterpreter()
 };

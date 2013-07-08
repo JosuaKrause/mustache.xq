@@ -1,9 +1,9 @@
 <tests>
   <test name="Variables" section="etag">
     <template>{'Hello {{word}}!'}</template>
-    <hash compiler="json">{'{"word": "world"}'}</hash>
-    <hash compiler="xmlf"><word>world</word></hash>
-    <hash compiler="xmls"><entry name="word">world</entry></hash>
+    <hash interpreter="json">{'{"word": "world"}'}</hash>
+    <hash interpreter="xmlf"><word>world</word></hash>
+    <hash interpreter="xmls"><entry name="word">world</entry></hash>
     <output><div>Hello world!</div></output>
     <parseTree>
       <multi>
@@ -15,9 +15,9 @@
   </test>
   <test name="Two mustaches With No Whitespace" section="whitespace">
     <template>{'{{word}}{{word}}!'}</template>
-    <hash compiler="json">{'{"word": "la"}'}</hash>
-    <hash compiler="xmlf"><word>la</word></hash>
-    <hash compiler="xmls"><entry name="word">la</entry></hash>
+    <hash interpreter="json">{'{"word": "la"}'}</hash>
+    <hash interpreter="xmlf"><word>la</word></hash>
+    <hash interpreter="xmls"><entry name="word">la</entry></hash>
     <output><div>lala!</div></output>
     <parseTree>
       <multi>
@@ -29,9 +29,9 @@
   </test>
   <test name="Variables with embedded XQuery" section="etag">
     <template>{'x=4+5*2={{x}}'}</template>
-    <hash compiler="json">{'{ "x": ' || ( xs:integer(4) + 5 ) * 2 || '}'}</hash>
-    <hash compiler="xmlf"><x>{ ( xs:integer(4) + 5 ) * 2 }</x></hash>
-    <hash compiler="xmls"><entry name="x">{ (xs:integer(4) + 5 ) * 2 }</entry></hash>
+    <hash interpreter="json">{'{ "x": ' || ( xs:integer(4) + 5 ) * 2 || '}'}</hash>
+    <hash interpreter="xmlf"><x>{ ( xs:integer(4) + 5 ) * 2 }</x></hash>
+    <hash interpreter="xmls"><entry name="x">{ (xs:integer(4) + 5 ) * 2 }</entry></hash>
     <output><div>x=4+5*2=18</div></output>
     <parseTree>
       <multi>
@@ -45,12 +45,12 @@
     * {{age}}
     * {{company}}
     * {{{company}}}'}</template>
-    <hash compiler="json">{'{
+    <hash interpreter="json">{'{
       "name": "Chris",
       "company": "<b>GitHub</b>"
     }'}</hash>
-    <hash compiler="xmlf"><name>Chris</name><company><b>GitHub</b></company></hash>
-    <hash compiler="xmls"><entry name="name">Chris</entry><entry name="company"><b>GitHub</b></entry></hash>
+    <hash interpreter="xmlf"><name>Chris</name><company><b>GitHub</b></company></hash>
+    <hash interpreter="xmls"><entry name="name">Chris</entry><entry name="company"><b>GitHub</b></entry></hash>
     <output>
       <div>
         * Chris
@@ -74,9 +74,9 @@
   </test>
   <test name="Simple Escaped Variables with {{&amp;var}}" section="utag">
     <template>{'{{&amp; name}}'}</template>
-    <hash compiler="json">{'{"name":"<b>Pete Aven</b>"}'}</hash>
-    <hash compiler="xmlf"><name><b>Pete Aven</b></name></hash>
-    <hash compiler="xmls"><entry name="name"><b>Pete Aven</b></entry></hash>
+    <hash interpreter="json">{'{"name":"<b>Pete Aven</b>"}'}</hash>
+    <hash interpreter="xmlf"><name><b>Pete Aven</b></name></hash>
+    <hash interpreter="xmls"><entry name="name"><b>Pete Aven</b></entry></hash>
     <output><div><b>Pete Aven</b></div></output>
     <parseTree>
       <multi>
@@ -89,12 +89,12 @@
     * {{age}}
     * {{company}}
     * {{&amp;company}}'}</template>
-    <hash compiler="json">{'{
+    <hash interpreter="json">{'{
       "name": "Chris",
       "company": "<b>GitHub</b>"
     }'}</hash>
-    <hash compiler="xmlf"><name>Chris</name><company><b>GitHub</b></company></hash>
-    <hash compiler="xmls"><entry name="name">Chris</entry><entry name="company"><b>GitHub</b></entry></hash>
+    <hash interpreter="xmlf"><name>Chris</name><company><b>GitHub</b></company></hash>
+    <hash interpreter="xmls"><entry name="name">Chris</entry><entry name="company"><b>GitHub</b></entry></hash>
     <output>
       <div>
         * Chris
@@ -121,11 +121,11 @@
     {{#nothin}}
       Never shown!
     {{/nothin}}'}</template>
-    <hash compiler="json">{'{
+    <hash interpreter="json">{'{
       "person": true
     }'}</hash>
-    <hash compiler="xmlf"><person>true</person></hash>
-    <hash compiler="xmls"><entry name="person">true</entry></hash>
+    <hash interpreter="xmlf"><person>true</person></hash>
+    <hash interpreter="xmls"><entry name="person">true</entry></hash>
     <output><div>Shown.</div></output>
     <parseTree>
       <multi>
@@ -141,11 +141,11 @@
     {{#nothin}}
       Also shown!
     {{/nothin}}'}</template>
-    <hash compiler="json">{'{
+    <hash interpreter="json">{'{
       "nothin": true
     }'}</hash>
-    <hash compiler="xmlf"><nothin>true</nothin></hash>
-    <hash compiler="xmls"><entry name="nothin">true</entry></hash>
+    <hash interpreter="xmlf"><nothin>true</nothin></hash>
+    <hash interpreter="xmls"><entry name="nothin">true</entry></hash>
     <output><div>Shown. Also shown!</div></output>
     <parseTree>
       <multi>
@@ -161,11 +161,11 @@
     {{#nothin}}
       Never shown!
     {{/nothin}}'}</template>
-    <hash compiler="json">{'{
+    <hash interpreter="json">{'{
       "nothin": false
     }'}</hash>
-    <hash compiler="xmlf"><nothin>false</nothin></hash>
-    <hash compiler="xmls"><entry name="nothin">false</entry></hash>
+    <hash interpreter="xmlf"><nothin>false</nothin></hash>
+    <hash interpreter="xmls"><entry name="nothin">false</entry></hash>
     <output><div>Shown.</div></output>
     <parseTree>
       <multi>
@@ -181,11 +181,11 @@
     {{#nothin}}
       Never shown!
     {{/nothin}}'}</template>
-    <hash compiler="json">{'{
+    <hash interpreter="json">{'{
       "nothin": []
     }'}</hash>
-    <hash compiler="xmlf"><nothin /></hash>
-    <hash compiler="xmls"><entry name="nothin" /></hash>
+    <hash interpreter="xmlf"><nothin /></hash>
+    <hash interpreter="xmls"><entry name="nothin" /></hash>
     <output><div>Shown.</div></output>
     <parseTree>
       <multi>
@@ -200,19 +200,19 @@
     <template>{'{{#repo}}
     <b>{{name}}</b>
   {{/repo}}'}</template>
-    <hash compiler="json">{'{
+    <hash interpreter="json">{'{
       "repo": [
         { "name": "resque" },
         { "name": "hub" },
         { "name": "rip" }
       ]
     }'}</hash>
-    <hash compiler="xmlf">
+    <hash interpreter="xmlf">
       <repo><name>resque</name></repo>
       <repo><name>hub</name></repo>
       <repo><name>rip</name></repo>
     </hash>
-    <hash compiler="xmls">
+    <hash interpreter="xmls">
       <entry name="repo"><entry name="name">resque</entry></entry>
       <entry name="repo"><entry name="name">hub</entry></entry>
       <entry name="repo"><entry name="name">rip</entry></entry>
@@ -236,12 +236,12 @@
   </test>
   <test name="Array of Strings" section="section">
     <template>{'{{#array_of_strings}} {{.}}! {{/array_of_strings}}'}</template>
-    <hash compiler="json">{'{"array_of_strings": ["hello", "world"]}'}</hash>
-    <hash compiler="xmlf">
+    <hash interpreter="json">{'{"array_of_strings": ["hello", "world"]}'}</hash>
+    <hash interpreter="xmlf">
       <array_of_strings>hello</array_of_strings>
       <array_of_strings>world</array_of_strings>
     </hash>
-    <hash compiler="xmls">
+    <hash interpreter="xmls">
       <entry name="array_of_strings">hello</entry>
       <entry name="array_of_strings">world</entry>
     </hash>
@@ -260,11 +260,11 @@
     {{^nothin}}
       Also shown!
     {{/nothin}}'}</template>
-    <hash compiler="json">{'{
+    <hash interpreter="json">{'{
       "person": true
     }'}</hash>
-    <hash compiler="xmlf"><person>true</person></hash>
-    <hash compiler="xmls"><entry name="person">true</entry></hash>
+    <hash interpreter="xmlf"><person>true</person></hash>
+    <hash interpreter="xmls"><entry name="person">true</entry></hash>
     <output><div>Shown. Also shown!</div></output>
     <parseTree>
       <multi>
@@ -280,11 +280,11 @@
     {{^nothin}}
       Not shown!
     {{/nothin}}'}</template>
-    <hash compiler="json">{'{
+    <hash interpreter="json">{'{
       "nothin": true
     }'}</hash>
-    <hash compiler="xmlf"><nothin>true</nothin></hash>
-    <hash compiler="xmls"><entry name="nothin">true</entry></hash>
+    <hash interpreter="xmlf"><nothin>true</nothin></hash>
+    <hash interpreter="xmls"><entry name="nothin">true</entry></hash>
     <output><div>Shown.</div></output>
     <parseTree>
       <multi>
@@ -300,11 +300,11 @@
     {{^nothin}}
       Also shown!
     {{/nothin}}'}</template>
-    <hash compiler="json">{'{
+    <hash interpreter="json">{'{
       "nothin": false
     }'}</hash>
-    <hash compiler="xmlf"><nothin>false</nothin></hash>
-    <hash compiler="xmls"><entry name="nothin">false</entry></hash>
+    <hash interpreter="xmlf"><nothin>false</nothin></hash>
+    <hash interpreter="xmls"><entry name="nothin">false</entry></hash>
     <output><div>Shown. Also shown!</div></output>
     <parseTree>
       <multi>
@@ -320,11 +320,11 @@
     {{^nothin}}
       Also shown!
     {{/nothin}}'}</template>
-    <hash compiler="json">{'{
+    <hash interpreter="json">{'{
       "nothin": []
     }'}</hash>
-    <hash compiler="xmlf"><nothin></nothin></hash>
-    <hash compiler="xmls"><entry name="nothin"></entry></hash>
+    <hash interpreter="xmlf"><nothin></nothin></hash>
+    <hash interpreter="xmls"><entry name="nothin"></entry></hash>
     <output><div>Shown. Also shown!</div></output>
     <parseTree>
       <multi>
@@ -339,19 +339,19 @@
     <template>{'Testing {{^repo}}
     <b>{{name}}</b>
   {{/repo}}'}</template>
-    <hash compiler="json">{'{
+    <hash interpreter="json">{'{
       "repo": [
         { "name": "resque" },
         { "name": "hub" },
         { "name": "rip" }
       ]
     }'}</hash>
-    <hash compiler="xmlf">
+    <hash interpreter="xmlf">
       <repo><name>resque</name></repo>
       <repo><name>hub</name></repo>
       <repo><name>rip</name></repo>
     </hash>
-    <hash compiler="xmls">
+    <hash interpreter="xmls">
       <entry name="repo"><entry name="name">resque</entry></entry>
       <entry name="repo"><entry name="name">hub</entry></entry>
       <entry name="repo"><entry name="name">rip</entry></entry>
@@ -370,9 +370,9 @@
   </test>
   <test name="Comments"  section="comment">
     <template>{'<h1>Today{{! ignore me }}.</h1>'}</template>
-    <hash compiler="json">{'{}'}</hash>
-    <hash compiler="xmlf"></hash>
-    <hash compiler="xmls"></hash>
+    <hash interpreter="json">{'{}'}</hash>
+    <hash interpreter="xmlf"></hash>
+    <hash interpreter="xmls"></hash>
     <output><div><h1>Today.</h1></div></output>
     <parseTree>
       <multi>
@@ -387,13 +387,13 @@
     {{#in_ca}} Well,
       ${{taxed_value}}, after taxes.
     {{/in_ca}}'}</template>
-    <hash compiler="json">{'{
+    <hash interpreter="json">{'{
       "name": "Chris",
       "value": 10000,
       "taxed_value": ' || 10000 - (10000 * 0.4) || ',
       "in_ca": true }'}</hash>
-    <hash compiler="xmlf"><name>Chris</name><value>10000</value><taxed_value>{ 10000 - (10000 * 0.4) }</taxed_value><in_ca>true</in_ca></hash>
-    <hash compiler="xmls">
+    <hash interpreter="xmlf"><name>Chris</name><value>10000</value><taxed_value>{ 10000 - (10000 * 0.4) }</taxed_value><in_ca>true</in_ca></hash>
+    <hash interpreter="xmls">
       <entry name="name">Chris</entry>
       <entry name="value">10000</entry>
       <entry name="taxed_value">{ 10000 - (10000 * 0.4) }</entry>
@@ -422,11 +422,11 @@
     {{^repo}}
       No repos :(
     {{/repo}}'}</template>
-    <hash compiler="json">{'{
+    <hash interpreter="json">{'{
       "repo": []
     }'}</hash>
-    <hash compiler="xmlf"><repo></repo></hash>
-    <hash compiler="xmls"><entry name="repo"></entry></hash>
+    <hash interpreter="xmlf"><repo></repo></hash>
+    <hash interpreter="xmls"><entry name="repo"></entry></hash>
     <output><div>No repos :(</div></output>
     <parseTree>
       <multi>
@@ -450,11 +450,11 @@
       <b>{{name}}</b>
     {{/repo}}
     '}</template>
-    <hash compiler="json">{'{
+    <hash interpreter="json">{'{
       "repo": []
     }'}</hash>
-    <hash compiler="xmlf"><repo></repo></hash>
-    <hash compiler="xmls"><entry name="repo"></entry></hash>
+    <hash interpreter="xmlf"><repo></repo></hash>
+    <hash interpreter="xmls"><entry name="repo"></entry></hash>
     <output><div>No repos :(</div></output>
     <parseTree>
       <multi>
@@ -471,9 +471,9 @@
   </test>
   <test name="Simple Whitespace" section="whitespace">
     <template>{'{{tag}} foo'}</template>
-    <hash compiler="json">{'{ "tag": "yo" }'}</hash>
-    <hash compiler="xmlf"><tag>yo</tag></hash>
-    <hash compiler="xmls"><entry name="tag">yo</entry></hash>
+    <hash interpreter="json">{'{ "tag": "yo" }'}</hash>
+    <hash interpreter="xmlf"><tag>yo</tag></hash>
+    <hash interpreter="xmls"><entry name="tag">yo</entry></hash>
     <output><div>yo foo</div></output>
     <parseTree>
       <multi>
@@ -484,7 +484,7 @@
   </test>
   <test name="Descendant Extension" section="ext">
     <template>{'* {{*name}}'}</template>
-    <hash compiler="json">{'{
+    <hash interpreter="json">{'{
         "people": {
             "person": {
                 "name": "Chris"
@@ -492,8 +492,8 @@
             "name": "Jan"
         }
     }'}</hash>
-    <hash compiler="xmlf"><people><person><name>Chris</name></person><name>Jan</name></people></hash>
-    <hash compiler="xmls">
+    <hash interpreter="xmlf"><people><person><name>Chris</name></person><name>Jan</name></people></hash>
+    <hash interpreter="xmls">
       <entry name="people">
         <entry name="person"><entry name="name">Chris</entry></entry>
         <entry name="name">Jan</entry>
@@ -509,7 +509,7 @@
   </test>
   <test name="Descendant Extension Inside Section" section="complex">
     <template>{'* {{#people}}{{#person}}{{*name}}{{/person}}{{/people}}'}</template>
-    <hash compiler="json">{'{
+    <hash interpreter="json">{'{
         "people": {
             "person": {
                 "name": "Chris",
@@ -518,8 +518,8 @@
             "name": "Jan"
         }
     }'}</hash>
-    <hash compiler="xmlf"><people><person><name>Chris</name></person><person><name>Kelly</name></person><name>Jan</name></people></hash>
-    <hash compiler="xmls">
+    <hash interpreter="xmlf"><people><person><name>Chris</name></person><person><name>Kelly</name></person><name>Jan</name></people></hash>
+    <hash interpreter="xmls">
       <entry name="people">
         <entry name="person"><entry name="name">Chris</entry></entry>
         <entry name="person"><entry name="name">Kelly</entry></entry>
@@ -540,12 +540,12 @@
   </test>
   <test name="Dot Notation Sections" section="complex">
     <template>{'{{person.name}}'}</template>
-    <hash compiler="json">{'{ "person": {
+    <hash interpreter="json">{'{ "person": {
       "name": "Chris",
       "company": "<b>GitHub</b>"
     } }'}</hash>
-    <hash compiler="xmlf"><person><name>Chris</name><company><b>GitHub</b></company></person></hash>
-    <hash compiler="xmls"><entry name="person"><entry name="name">Chris</entry><entry name="company"><b>GitHub</b></entry></entry></hash>
+    <hash interpreter="xmlf"><person><name>Chris</name><company><b>GitHub</b></company></person></hash>
+    <hash interpreter="xmls"><entry name="person"><entry name="name">Chris</entry><entry name="company"><b>GitHub</b></entry></entry></hash>
     <output><div>Chris</div></output>
     <parseTree>
       <multi>
@@ -557,17 +557,17 @@
   </test>
   <test name="Nested Sections" section="complex">
     <template>{'{{#foo}}{{#a}}{{b}}{{/a}}{{/foo}}'}</template>
-    <hash compiler="json">{'{ "foo": [
+    <hash interpreter="json">{'{ "foo": [
       {"a": {"b": 1}},
       {"a": {"b": 2}},
       {"a": {"b": 3}}
     ] }'}</hash>
-    <hash compiler="xmlf">
+    <hash interpreter="xmlf">
       <foo><a><b>1</b></a></foo>
       <foo><a><b>2</b></a></foo>
       <foo><a><b>3</b></a></foo>
     </hash>
-    <hash compiler="xmls">
+    <hash interpreter="xmls">
       <entry name="foo"><entry name="a"><entry name="b">1</entry></entry></entry>
       <entry name="foo"><entry name="a"><entry name="b">2</entry></entry></entry>
       <entry name="foo"><entry name="a"><entry name="b">3</entry></entry></entry>
@@ -587,11 +587,11 @@
   </test>
   <test name="Welcome Joe" section="complex">
     <template>{'{{greeting}}, {{name}}!'}</template>
-    <hash compiler="json">{'{
+    <hash interpreter="json">{'{
       "name": "Joe",
       "greeting": "Welcome" }'}</hash>
-    <hash compiler="xmlf"><name>Joe</name><greeting>Welcome</greeting></hash>
-    <hash compiler="xmls"><entry name="name">Joe</entry><entry name="greeting">Welcome</entry></hash>
+    <hash interpreter="xmlf"><name>Joe</name><greeting>Welcome</greeting></hash>
+    <hash interpreter="xmls"><entry name="name">Joe</entry><entry name="greeting">Welcome</entry></hash>
     <output><div>Welcome, Joe!</div></output>
     <parseTree>
       <multi>
@@ -613,12 +613,12 @@
            {{/section}}
 {{/section}}
       {{/book}}'}</template>
-    <hash compiler="json">{'
+    <hash interpreter="json">{'
       {"book": {"section": {"section": {"section": {"p": "Alive!"}}}}}'}</hash>
-    <hash compiler="xmlf">
+    <hash interpreter="xmlf">
       <book><section><section><section><p>Alive!</p></section></section></section></book>
     </hash>
-    <hash compiler="xmls">
+    <hash interpreter="xmls">
       <entry name="book"><entry name="section"><entry name="section"><entry name="section"><entry name="p">Alive!</entry></entry></entry></entry></entry>
     </hash>
     <output><div>Alive!</div></output>
@@ -660,7 +660,7 @@
       <p>The list is empty.</p>
     {{/empty}}
     '}</template>
-    <hash compiler="json">{'{
+    <hash interpreter="json">{'{
       "header": "Colors",
       "items": [
           {"name": "red", "first": true, "url": "#Red"},
@@ -669,7 +669,7 @@
       ],
       "empty": false
     }'}</hash>
-    <hash compiler="xmlf">
+    <hash interpreter="xmlf">
       <header>Colors</header>
       <items>
         <name>red</name>
@@ -687,7 +687,7 @@
         <url>#Blue</url>
       </items>
     </hash>
-    <hash compiler="xmls">
+    <hash interpreter="xmls">
       <entry name="header">Colors</entry>
       <entry name="items">
         <entry name="name">red</entry>
@@ -751,7 +751,7 @@
         <li>{{label}}</li>
         {{/a_list}}
       </ul>{{/a_object}}'}</template>
-    <hash compiler="json">{'{
+    <hash interpreter="json">{'{
         "a_object": {
             "title": "this is an object",
             "description": "one of its attributes is a list",
@@ -765,7 +765,7 @@
             ]
         }
     }'}</hash>
-    <hash compiler="xmlf">
+    <hash interpreter="xmlf">
       <a_object>
         <title>this is an object</title>
         <description>one of its attributes is a list</description>
@@ -777,7 +777,7 @@
         </a_list>
       </a_object>
     </hash>
-    <hash compiler="xmls">
+    <hash interpreter="xmls">
       <entry name="a_object">
         <entry name="title">this is an object</entry>
         <entry name="description">one of its attributes is a list</entry>
@@ -823,13 +823,13 @@
       {{index}}
     {{/terms}}
     '}</template>
-    <hash compiler="json">{'{
+    <hash interpreter="json">{'{
       "terms": [
         {"name": "t1", "index": 0},
         {"name": "t2", "index": 1}
       ]
     }'}</hash>
-    <hash compiler="xmlf">
+    <hash interpreter="xmlf">
       <terms>
         <name>t1</name>
         <index>0</index>
@@ -839,7 +839,7 @@
         <index>1</index>
       </terms>
     </hash>
-    <hash compiler="xmls">
+    <hash interpreter="xmls">
       <entry name="terms">
         <entry name="name">t1</entry>
         <entry name="index">0</entry>
@@ -872,12 +872,12 @@
   </test>
   <test name="Apos" section="complex">
     <template>{'{{apos}}{{control}}'}</template>
-    <hash compiler="json">{'{"apos": "&#39;", "control":"X"}'}</hash>
-    <hash compiler="xmlf">
+    <hash interpreter="json">{'{"apos": "&#39;", "control":"X"}'}</hash>
+    <hash interpreter="xmlf">
       <apos>&#39;</apos>
       <control>X</control>
     </hash>
-    <hash compiler="xmls">
+    <hash interpreter="xmls">
       <entry name="apos">&#39;</entry>
       <entry name="control">X</entry>
     </hash>
@@ -896,13 +896,13 @@
       {{name}}
       {{index}}
     {{/terms}}'}</template>
-    <hash compiler="json">{'
+    <hash interpreter="json">{'
       {"name": "name",
       "description": "desc",
       "terms": [
         {"name": "t1", "index": 0},
         {"name": "t2", "index": 1} ] }'}</hash>
-    <hash compiler="xmlf">
+    <hash interpreter="xmlf">
       <name>name</name>
       <description>desc</description>
       <terms>
@@ -914,7 +914,7 @@
         <index>1</index>
       </terms>
     </hash>
-    <hash compiler="xmls">
+    <hash interpreter="xmls">
       <entry name="name">name</entry>
       <entry name="description">desc</entry>
       <entry name="terms">
@@ -945,12 +945,12 @@
   </test>
   <test name="Sequencial Mustaches" section="complex">
     <template>{'I like going to the {{location}} because I find it {{verb}}'}</template>
-    <hash compiler="json">{'{"location": "mall", "verb": "fun"}'}</hash>
-    <hash compiler="xmlf">
+    <hash interpreter="json">{'{"location": "mall", "verb": "fun"}'}</hash>
+    <hash interpreter="xmlf">
       <location>mall</location>
       <verb>fun</verb>
     </hash>
-    <hash compiler="xmls">
+    <hash interpreter="xmls">
       <entry name="location">mall</entry>
       <entry name="verb">fun</entry>
     </hash>
@@ -966,17 +966,17 @@
   </test>
   <test name="Dot Notation with Nested Sections" section="complex">
     <template>{'{{person.name.first}}'}</template>
-    <hash compiler="json">{'{ "person": {
+    <hash interpreter="json">{'{ "person": {
       "name": {"first": "Chris"},
       "company": "<b>GitHub</b>"
     } }'}</hash>
-    <hash compiler="xmlf">
+    <hash interpreter="xmlf">
       <person>
         <name><first>Chris</first></name>
         <company><b>GitHub</b></company>
       </person>
     </hash>
-    <hash compiler="xmls">
+    <hash interpreter="xmls">
       <entry name="person">
         <entry name="name"><entry name="first">Chris</entry></entry>
         <entry name="company"><b>GitHub</b></entry>
@@ -995,9 +995,9 @@
   </test>
   <test name="Not Found" section="complex">
     <template>{'{{foo}}'}</template>
-    <hash compiler="json">{'{ "bar": "yo" }'}</hash>
-    <hash compiler="xmlf"><bar>yo</bar></hash>
-    <hash compiler="xmls"><entry name="bar">yo</entry></hash>
+    <hash interpreter="json">{'{ "bar": "yo" }'}</hash>
+    <hash interpreter="xmlf"><bar>yo</bar></hash>
+    <hash interpreter="xmls"><entry name="bar">yo</entry></hash>
     <output><div/></output>
     <parseTree>
       <multi>
@@ -1009,15 +1009,15 @@
     <template>{'{{tag1}} is in normal angular brackets.
 {{=<% %>=}}
 <%tag2%> is in ERB style.'}</template>
-    <hash compiler="json">{'{
+    <hash interpreter="json">{'{
   "tag1": "Tag 1",
   "tag2": "Tag 2"
 }'}</hash>
-    <hash compiler="xmlf">
+    <hash interpreter="xmlf">
       <tag1>Tag 1</tag1>
       <tag2>Tag 2</tag2>
     </hash>
-    <hash compiler="xmls">
+    <hash interpreter="xmls">
       <entry name="tag1">Tag 1</entry>
       <entry name="tag2">Tag 2</entry>
     </hash>
@@ -1043,17 +1043,17 @@ Tag 2 is in ERB style.</div></output>
 <%tag2%> is in ERB style.
 <%={{ }}=%>
 {{tag3}} is in normal style again.'}</template>
-    <hash compiler="json">{'{
+    <hash interpreter="json">{'{
   "tag1": "Tag 1",
   "tag2": "Tag 2",
   "tag3": "Tag 3"
 }'}</hash>
-    <hash compiler="xmlf">
+    <hash interpreter="xmlf">
       <tag1>Tag 1</tag1>
       <tag2>Tag 2</tag2>
       <tag3>Tag 3</tag3>
     </hash>
-    <hash compiler="xmls">
+    <hash interpreter="xmls">
       <entry name="tag1">Tag 1</entry>
       <entry name="tag2">Tag 2</entry>
       <entry name="tag3">Tag 3</entry>
@@ -1083,13 +1083,13 @@ Tag 3 is in normal style again.</div></output>
   </test>
   <test name="Partial import" section="partial">
     <template>{'<h2>Names</h2>{{#names}}{{> partial_import.xq}}{{/names}}'}</template>
-    <hash compiler="json">{'{
+    <hash interpreter="json">{'{
 	"names": [
 	  { "name": "Peter" },
 	  { "name": "Klaus" }
 	]}'}
     </hash>
-    <hash compiler="xmlf">
+    <hash interpreter="xmlf">
       <names>
         <name>Peter</name>
       </names>
@@ -1097,7 +1097,7 @@ Tag 3 is in normal style again.</div></output>
         <name>Klaus</name>
       </names>
     </hash>
-    <hash compiler="xmls">
+    <hash interpreter="xmls">
       <entry name="names"><entry name="name">Peter</entry></entry>
       <entry name="names"><entry name="name">Klaus</entry></entry>
     </hash>
@@ -1116,13 +1116,13 @@ Tag 3 is in normal style again.</div></output>
   </test>
   <test name="Double partial import" section="partial">
     <template>{'<h2>Names</h2>{{#names}}{{> partial_import2.xq}}{{/names}}'}</template>
-    <hash compiler="json">{'{
+    <hash interpreter="json">{'{
 	"names": [
 	  { "name": "Peter" },
 	  { "name": "Klaus" }
 	]}'}
     </hash>
-    <hash compiler="xmlf">
+    <hash interpreter="xmlf">
       <names>
         <name>Peter</name>
       </names>
@@ -1130,7 +1130,7 @@ Tag 3 is in normal style again.</div></output>
         <name>Klaus</name>
       </names>
     </hash>
-    <hash compiler="xmls">
+    <hash interpreter="xmls">
       <entry name="names"><entry name="name">Peter</entry></entry>
       <entry name="names"><entry name="name">Klaus</entry></entry>
     </hash>
@@ -1240,9 +1240,9 @@ Tag 3 is in normal style again.</div></output>
 <!--
       <test name="" section="">
         <template>{''}</template>
-        <hash compiler="json">{''}</hash>
-        <hash compiler="xmlf"></hash>
-        <hash compiler="xmls"></hash>
+        <hash interpreter="json">{''}</hash>
+        <hash interpreter="xmlf"></hash>
+        <hash interpreter="xmls"></hash>
         <output><div></div></output>
         <parseTree>
           <multi/>

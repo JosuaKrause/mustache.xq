@@ -33,12 +33,12 @@ declare variable $page:files := map {
   "xml"  := "/res.xml"
 };
 
-declare variable $page:compilers := map {
-  "json" := mustache:JSONcompiler(),
-  "xml"  := mustache:freeXMLcompiler()
+declare variable $page:interpreters := map {
+  "json" := mustache:JSONinterpreter(),
+  "xml"  := mustache:freeXMLinterpreter()
 };
 
-declare variable $page:interpret := map {
+declare variable $page:preprocess := map {
   "json" := function($input) { json:parse($input)/root },
   "xml"  := function($input) { parse-xml($input)/node() }
 };
@@ -48,10 +48,10 @@ declare %restxq:path("{$backend}/html")
         %output:method("text")
         %output:media-type("text/html")
         function page:search-result($backend as xs:string) {
-  let $input    := file:read-text($page:path || $page:files($backend), "utf-8")
-     ,$compiler := $page:compilers($backend)
-     ,$content  := $page:interpret($backend)($input)
-     ,$output   := mustache:compile-plain(mustache:parse($page:result_tmpl), $content, $page:functions, $compiler, $page:path)
+  let $input       := file:read-text($page:path || $page:files($backend), "utf-8")
+     ,$interpreter := $page:interpreters($backend)
+     ,$content     := $page:preprocess($backend)($input)
+     ,$output      := mustache:interpret-plain(mustache:parse($page:result_tmpl), $content, $page:functions, $interpreter, $page:path)
   return $output
 };
 
@@ -60,9 +60,9 @@ declare %restxq:path("{$backend}/csv")
         %output:method("text")
         %output:media-type("text/csv")
         function page:search-csv($backend as xs:string) {
-  let $input    := file:read-text($page:path || $page:files($backend), "utf-8")
-     ,$compiler := $page:compilers($backend)
-     ,$content  := $page:interpret($backend)($input)
-     ,$output   := mustache:compile-plain(mustache:parse($page:csv_tmpl), $content, $page:functions, $compiler, $page:path)
+  let $input       := file:read-text($page:path || $page:files($backend), "utf-8")
+     ,$interpreter := $page:interpreters($backend)
+     ,$content     := $page:preprocess($backend)($input)
+     ,$output      := mustache:interpret-plain(mustache:parse($page:csv_tmpl), $content, $page:functions, $interpreter, $page:path)
   return $output
 };

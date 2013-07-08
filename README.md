@@ -35,7 +35,7 @@ Next, run the following query:
 
 ``` xquery
     import module namespace mustache = "http://basex.org/modules/mustache/mustache";
-    mustache:compile-plain( mustache:parse('Hello {{text}}!'), '{ "text": "world"}', map { }, mustache:JSONcompiler() )
+    mustache:interpret-plain( mustache:parse('Hello {{text}}!'), '{ "text": "world"}', map { }, mustache:JSONinterpreter() )
 ```
 
 Returns
@@ -89,7 +89,7 @@ An example for a Hello World test would be:
 ``` xml
      <test name="Hello World">
        <template>{'Hello {{word}}!'}</template>
-       <hash compiler="json">{'{"word": "world"}'}</hash>
+       <hash interpreter="json">{'{"word": "world"}'}</hash>
        <output><div>Hello world!</div></output>
      </test>
 ```
@@ -171,7 +171,7 @@ or
      Hash     : { }
      Output   : Entries: 10
 
-     Calls the function `count` which can be handed in via the compile function.
+     Calls the function `count` which can be handed in via the `interpret` function.
      Please refer to the example folder for a complete example. The function
      may return any serializable value (in this case 10).
 
@@ -186,7 +186,7 @@ or
      Hash     : <entry name="car">bmw</entry>
      Output   : bmw
 
-     This can be used by choosing another compiler.
+     This can be used by choosing another interpreter.
      Please refer to the example folder for a complete example.
 
 ### Known Limitations

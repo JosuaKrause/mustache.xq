@@ -5,19 +5,19 @@ declare variable $dir := file:dir-name(static-base-uri()) || '/';
 declare variable $tests := xquery:invoke($dir || 'tests.xq');
 
 declare function local:summarize( $name, $nodes ) {
-  let $parseTests       := count($nodes/@parseTest)
-     ,$compileTests     := count($nodes/@compileTest)
-     ,$okParseTests     := count($nodes[@parseTest='ok'])
-     ,$nokParseTests    := count($nodes[@parseTest='NOK'])
-     ,$okCompileTests   := count($nodes[@compileTest='ok'])
-     ,$nokCompileTests  := count($nodes[@compileTest='NOK'])
+  let $parseTests          := count($nodes/@parseTest)
+     ,$interpreterTests    := count($nodes/@interpreterTest)
+     ,$okParseTests        := count($nodes[@parseTest='ok'])
+     ,$nokParseTests       := count($nodes[@parseTest='NOK'])
+     ,$okInterpreterTests  := count($nodes[@interpreterTest='ok'])
+     ,$nokInterpreterTests := count($nodes[@interpreterTest='NOK'])
   return element {$name}
   {
-    (attribute total {$parseTests+$compileTests},
+    (attribute total {$parseTests+$interpreterTests},
     <parseTests pass="{$okParseTests}" fail="{$nokParseTests}"   
       perc="{if($nokParseTests = 0) then '100' else round(100 * $okParseTests div ($okParseTests + $nokParseTests))}"/>,
-    <compileTests pass="{$okCompileTests}" fail="{$nokCompileTests}" 
-      perc="{if($nokCompileTests = 0) then '100' else round(100 * $okCompileTests div ($okCompileTests + $nokCompileTests))}"/>
+    <interpreterTests pass="{$okInterpreterTests}" fail="{$nokInterpreterTests}" 
+      perc="{if($nokInterpreterTests = 0) then '100' else round(100 * $okInterpreterTests div ($okInterpreterTests + $nokInterpreterTests))}"/>
     )
   }
 };
@@ -29,34 +29,34 @@ declare function local:parser-test($template, $parseTree) {
   })
 };
 
-declare function local:compiler-test($template, $hash, $output, $compiler_type) {
-  xquery:invoke( $dir || 'run-compiler.xq', map{
-	'template'  := $template,
-	'hash'      := $hash,
-	'output'    := $output,
-  'compiler'  := $compiler_type,
-  'base-path' := $dir
+declare function local:interpreter-test($template, $hash, $output, $interpreter_type) {
+  xquery:invoke( $dir || 'run-interpreter.xq', map{
+	'template'    := $template,
+	'hash'        := $hash,
+	'output'      := $output,
+  'interpreter' := $interpreter_type,
+  'base-path'   := $dir
   })
 };
 
 declare function local:run-test($i, $test as node(), $hash) as node()? {
-  let $template       := $test/template/string()
-     ,$compiler_type  := $hash/@compiler
+  let $template         := $test/template/string()
+     ,$interpreter_type := $hash/@interpreter
   return try {
-    let $section        := $test/@section
-       ,$parseTree      := $test/parseTree/*
-       ,$result         := local:parser-test( $template, $parseTree )
-       ,$valid          := $result[1]
-       ,$mTree          := $result[2]
-       ,$output         := if ($valid) then $test/output/* else () (: Don't run compile tests if parsing failed :)
-       ,$compilerTest   := $hash and $output and $parseTree
-       ,$compiled       := if($compilerTest) then local:compiler-test($template, $hash, $output, $compiler_type) else ()
-       ,$validCompiler  := $compiled[1]
-       ,$outputCompiler := parse-xml-fragment($compiled[2])
-       ,$outputExpected := parse-xml-fragment($compiled[3])
+    let $section           := $test/@section
+       ,$parseTree         := $test/parseTree/*
+       ,$result            := local:parser-test( $template, $parseTree )
+       ,$valid             := $result[1]
+       ,$mTree             := $result[2]
+       ,$output            := if ($valid) then $test/output/* else () (: Don't run interpreter tests if parsing failed :)
+       ,$interpreterTest   := $hash and $output and $parseTree
+       ,$interpreted       := if($interpreterTest) then local:interpreter-test($template, $hash, $output, $interpreter_type) else ()
+       ,$validInterpreter  := $interpreted[1]
+       ,$outputInterpreter := parse-xml-fragment($interpreted[2])
+       ,$outputExpected    := parse-xml-fragment($interpreted[3])
     return
-      <test position="{$i}" parseTest="{if($valid) then 'ok' else 'NOK'}" compiler="{$compiler_type}">
-        { $section, if($compilerTest) then attribute compileTest {if($validCompiler) then 'ok' else 'NOK'} else () }
+      <test position="{$i}" parseTest="{if($valid) then 'ok' else 'NOK'}" interpreter="{$interpreter_type}">
+        { $section, if($interpreterTest) then attribute interpreterTest {if($validInterpreter) then 'ok' else 'NOK'} else () }
         { string($test/@name) } 
         { if($valid)
           then ()
@@ -67,21 +67,21 @@ declare function local:run-test($i, $test as node(), $hash) as node()? {
               <got>{$mTree}</got>
             </parseTestExplanation>
         }
-        { if ($compilerTest) 
-          then if($validCompiler)
+        { if ($interpreterTest) 
+          then if($validInterpreter)
                then ()
                else 
-                 <compileTestExplanation> 
+                 <interpretTestExplanation> 
                    <template>{$template}</template>
                    {$hash}
                    <expected>{$outputExpected}</expected>
-                   <got>{$outputCompiler}</got>
-                 </compileTestExplanation>
+                   <got>{$outputInterpreter}</got>
+                 </interpretTestExplanation>
           else ()
         }
       </test>
   } catch * {
-    <test type="ERROR" code="{$err:code}" parseTest="NOK" compileTest="NOK" compiler="{$compiler_type}">
+    <test type="ERROR" code="{$err:code}" parseTest="NOK" interpreterTest="NOK" interpreter="{$interpreter_type}">
       {$test/@name}
  	   <description>{$err:description}</description>
  	   <template>{$template}</template>
