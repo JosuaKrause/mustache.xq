@@ -34,14 +34,14 @@ First, copy the contents of the repo directory into your [BaseX Repository][6].
 Next, run the following query:
 
 ``` xquery
-    import module namespace mustache = "http://basex.org/modules/mustache/mustache";
-    mustache:interpret-plain( mustache:parse('Hello {{text}}!'), '{ "text": "world"}', map { }, mustache:JSONinterpreter() )
+import module namespace mustache = "http://basex.org/modules/mustache/mustache";
+mustache:interpret-plain( mustache:parse('Hello {{text}}!'), '{ "text": "world"}', map { }, mustache:JSONinterpreter() )
 ```
 
 Returns
 
-``` xquery
-    Hello world!
+```
+Hello world!
 ```
 
 For more (fun) examples refer to "test/tests.xq". If you are new to mustache you can use it to learn more about it.
@@ -87,11 +87,11 @@ This will help us be faster fixing the problem.
 An example for a Hello World test would be:
 
 ``` xml
-     <test name="Hello World">
-       <template>{'Hello {{word}}!'}</template>
-       <hash interpreter="json">{'{"word": "world"}'}</hash>
-       <output><div>Hello world!</div></output>
-     </test>
+<test name="Hello World">
+    <template>{'Hello {{word}}!'}</template>
+    <hash interpreter="json">{'{"word": "world"}'}</hash>
+    <output><div>Hello world!</div></output>
+</test>
 ```
 
 This is not the actual test that we run (you can see a list of those in "test/tests.xq") but it's all the information we need for a bug report.
@@ -171,9 +171,9 @@ or
      Hash     : { }
      Output   : Entries: 10
 
-     Calls the function `count` which can be handed in via the `interpret` function.
-     Please refer to the example folder for a complete example. The function
-     may return any serializable value (in this case 10).
+Calls the function `count` which can be handed in via the `interpret` function.
+Please refer to the example folder for a complete example. The function
+may return any serializable value (in this case 10).
 
 ####  ✔ Non JSON inputs / hashs
      Template : {{car}}
@@ -186,8 +186,8 @@ or
      Hash     : <entry name="car">bmw</entry>
      Output   : bmw
 
-     This can be used by choosing another interpreter.
-     Please refer to the example folder for a complete example.
+This can be used by choosing another interpreter.
+Please refer to the example folder for a complete example.
 
 ### Known Limitations
 

@@ -24,16 +24,16 @@ declare function local:summarize( $name, $nodes ) {
 
 declare function local:parser-test($template, $parseTree) {
   xquery:invoke( $dir || 'run-parser.xq', map{
-	'template'  := $template,
-	'parseTree' := $parseTree
+  'template'  := $template,
+  'parseTree' := $parseTree
   })
 };
 
 declare function local:interpreter-test($template, $hash, $output, $interpreter_type) {
   xquery:invoke( $dir || 'run-interpreter.xq', map{
-	'template'    := $template,
-	'hash'        := $hash,
-	'output'      := $output,
+  'template'    := $template,
+  'hash'        := $hash,
+  'output'      := $output,
   'interpreter' := $interpreter_type,
   'base-path'   := $dir
   })
@@ -83,9 +83,9 @@ declare function local:run-test($i, $test as node(), $hash) as node()? {
   } catch * {
     <test type="ERROR" code="{$err:code}" parseTest="NOK" interpreterTest="NOK" interpreter="{$interpreter_type}">
       {$test/@name}
- 	   <description>{$err:description}</description>
- 	   <template>{$template}</template>
-	    {$hash}
+      <description>{$err:description}</description>
+      <template>{$template}</template>
+      {$hash}
     </test>
   }
 };
