@@ -14,14 +14,18 @@ For a language-agnostic overview of Mustache’s template syntax, see the
 
 ## Why?
 
-Mustache.xq is designed to help you when:
+Mustache.xq is designed to help you when you want to
 
-1. You want to avoid fn:concat to generate strings to keep your code more readable
-2. Want to render json as a string
-3. Internationalization
+1. avoid fn:concat to generate strings to keep your code more readable
+2. easily generate non-xml output
+3. use multiple backends (various xml and json styles)
+4. migrate from other mustache dialects
+5. separate your design from your logic
+6. have a modular code-base
 
-This Mustache.xq implementation works specifically for the XQuery processor
+This Mustache.xq implementation works best with the XQuery processor
 [BaseX][4]. It is a fork of the [MarkLogic specific mustache.xq][5] implementation.
+Other standard comform XQuery processors should work correctly as well.
 
 ## Usage
 
@@ -31,58 +35,17 @@ Next, run the following query:
 
 ``` xquery
     import module namespace mustache = "http://basex.org/modules/mustache/mustache";
-    mustache:render( 'Hello {{text}}!', '{ "text": "world"}' )
+    mustache:compile-plain( mustache:parse('Hello {{text}}!'), '{ "text": "world"}', map { }, mustache:JSONcompiler() )
 ```
 
 Returns
 
 ``` xquery
-    <div>Hello world!</div>
+    Hello world!
 ```
 
-A slightly more complicated example:
-
-``` xquery
-    mustache:render(
-      '<h1>{{header}}</h1> {{#bug}} {{/bug}}
-      {{#items}}
-        {{#first}}
-          <li><strong>{{name}}</strong></li>
-        {{/first}}
-        {{#link}}
-          <li><a href="{{url}}">{{name}}</a></li>
-        {{/link}}
-      {{/items}}
-      {{#empty}}
-        <p>The list is empty.</p>
-      {{/empty}}', 
-      '{ "header": "Colors",
-          "items": [
-              {"name": "red", "first": true, "url": "#Red"},
-              {"name": "green", "link": true, "url": "#Green"},
-              {"name": "blue", "link": true, "url": "#Blue"}
-          ],
-          "empty": false }')
-```
-
-Outputs:
-
-``` xml
-    <div>
-      <h1>Colors</h1>
-      <li>
-        <strong>red</strong>
-      </li>
-      <li>
-        <a href="#Green">green</a>
-      </li>
-      <li>
-        <a href="#Blue">blue</a>
-      </li>
-    </div>
-```
-
-For more (fun) examples refer to test/tests.xml. If you are new to mustache you can use it to learn more about it.
+For more (fun) examples refer to "test/tests.xq". If you are new to mustache you can use it to learn more about it.
+A full [rest-xq][7] based example can be found in the folder "example".
 
 ## Contribute
 
@@ -95,8 +58,7 @@ Everyone is welcome to contribute.
 5. Push to your branch - `git push origin my_branch`
 6. Create a pull request
 
-The documentation is severely lacking. Feel free to contribute to the wiki if 
-you think something could be improved.
+Feel free to contribute to the wiki if you think something could be improved.
 
 ### Running the tests
 
@@ -117,7 +79,7 @@ the following information:
 
 * Name
 * Template
-* Hash
+* Hash / Input
 * Output
 
 This will help us be faster fixing the problem.
@@ -127,118 +89,124 @@ An example for a Hello World test would be:
 ``` xml
      <test name="Hello World">
        <template>{'Hello {{word}}!'}</template>
-       <hash>{'{"word": "world"}'}</hash>
-       <output><div>Hello world !</div></output>
+       <hash compiler="json">{'{"word": "world"}'}</hash>
+       <output><div>Hello world!</div></output>
      </test>
 ```
 
-This is not the actual test that we run (you can see a list of those in test/index.xqy) but it's all the information we need for a bug report.
+This is not the actual test that we run (you can see a list of those in "test/tests.xq") but it's all the information we need for a bug report.
 
 ## Supported Functionality
 
 ####  ✔ Variables
      Template : {{car}}
      Hash     : { "car": "bmw"}
-     Output   : <div>bmw</div>
+     Output   : bmw
 
 ####  ✔ Unescaped Variables
      Template : {{company}} {{{company}}}
      Hash     : { "company": "<b>BaseX</b>" }
-     Output   : <div>&lt;b&gt;BaseX&lt;/b&gt; <b>BaseX</b></div>
+     Output   : &lt;b&gt;BaseX&lt;/b&gt; <b>BaseX</b>
 
 or
 
      Template : {{company}} {{&amp;company}}
      Hash     : { "company": "<b>BaseX</b>" }
-     Output   : <div>&lt;b&gt;BaseX&lt;/b&gt; <b>BaseX</b></div>
+     Output   : &lt;b&gt;BaseX&lt;/b&gt; <b>BaseX</b>
 
 ####  ✔ Sections with Non-False Values
-     Template : Shown. {{#nothin}} Never shown! {{/nothin}}
+     Template : Shown.{{#nothin}} Never shown!{{/nothin}}
      Hash     : { "person": true }
-     Output   : <div>Shown.</div>
+     Output   : Shown.
 
 ####  ✔ False Values or Empty Lists
-     Template : Shown.{{#nothing}}Never shown!{{/nothing}}
+     Template : Shown.{{#nothing}} Never shown!{{/nothing}}
      Hash     : { "different": true }
-     Output   : <div>Shown.</div>
+     Output   : Shown.
 
 ####  ✔ Nested Sections
      Template : {{#foo}}{{#a}}{{b}}{{/a}}{{/foo}}
      Hash     : { "foo": [ {"a": {"b": 1}}, {"a": {"b": 2}}, {"a": {"b": 3}} ] }
-     Output   : <div>123</div>
+     Output   : 123
 
 ####  ✔ Non-Empty Lists
      Template : {{#repo}} <b>{{name}}</b> {{/repo}}
      Hash     : { "repo": [ { "name": "resque" }, { "name": "hub" }, { "name": "rip" } ] }
-     Output   : <div><b>resque</b><b>hub</b><b>rip</b></div>
+     Output   : <b>resque</b><b>hub</b><b>rip</b>
 
 ####  ✔ Inverted Sections
-     Template : {{#repo}}<b>{{name}}</b>{{/repo}}{{^repo}} No repos :({{/repo}}
+     Template : {{#repo}}<b>{{name}}</b>{{/repo}}{{^repo}}No repos :({{/repo}}
      Hash     : { "repo": [] }
-     Output   : <div>No Repos :(</div>
-
-####  ✕ Lambdas
+     Output   : No Repos :(
 
 ####  ✔ Comments
      Template : <h1>Today{{! ignore me }}.</h1>
-     Hash     : {}
-     Output   : <div><h1>Today.</h1></div>
+     Hash     : { }
+     Output   : <h1>Today.</h1>
 
 ####  ✔ Partials
      Template : <h2>Names</h2>{{#names}}{{> partial_import.xq}}{{/names}}
      Hash     : { "names": [ { "name": "Peter" }, { "name": "Klaus" } ] }
-     Output   : <div><h2>Names</h2><strong>Peter</strong><strong>Klaus</strong></div>
+     Output   : <h2>Names</h2><strong>Peter</strong><strong>Klaus</strong>
 
 ####  ✔ Set Delimiter
      Template : <h1>{{foo}}</h1><h2>{{=<% %>}}<%bar%></h2>
      Hash     : { "foo": "double mustaches", "bar": "ERB style" }
-     Output   : <div><h1>double moustaches</h1><h2>ERB style</h2></div>
+     Output   : <h1>double moustaches</h1><h2>ERB style</h2>
 
 ### Extensions
 
-####  (✔) Variables with embedded XQuery
-     Template : {{x}}
-     Hash     : '{ "x": ' || ( xs:integer(4) + 5 ) * 2 || '}'
-     Output   : <div>18</div>
-
 ####  ✔ Dot Notation
-     Template :{{person.name.first}}
-     Hash     :{ "person": { "name": { "first": "Eric" } } }
-     Output   :<div>Eric</div>
+     Template : {{person.name.first}}
+     Hash     : { "person": { "name": { "first": "Eric" } } }
+     Output   : Eric
 
 ####  ✔ Descendant Variable
      Template : * {{*name}}
      Hash     : { "people": { "person": { "name": "Chris" }, "name": "Jan" } }
-     Output   : <div>* Chris Jan</div>
+     Output   : <div>* ChrisJan</div>
 
-### Roadmap
+####  ✔ Function Calls
+     Template : Entries: {{:count}}
+     Hash     : { }
+     Output   : Entries: 10
 
-If you are interested in any of these (or other) feature and don't want to wait just read the instructions
-on "Contribute" and send in your code
+     Calls the function `count` which can be handed in via the compile function.
+     Please refer to the example folder for a complete example. The function
+     may return any serializable value (in this case 10).
 
-* Support XML as well as JSON
-* Clean up whitespace with "&#x0a;"
-* XQuery Lambdas (still haven't thought about how this magic would look like)
-* Partials
+####  ✔ Non JSON inputs / hashs
+     Template : {{car}}
+     Hash     : <car>bmw</car>
+     Output   : bmw
+
+or
+
+     Template : {{car}}
+     Hash     : <entry name="car">bmw</entry>
+     Output   : bmw
+
+     This can be used by choosing another compiler.
+     Please refer to the example folder for a complete example.
 
 ### Known Limitations
 
 In this section we have the know limitations excluding the features that are not supported. 
 To better understand what is supported refer to the Supported Features section
 
-* Output is returned inside a <div/> tag. This is to support escaping.
-* Key names must be valid QNames (limitation of json.xqy and generator.xqy)
+* Key names that are no valid QNames may generate unexpected behaviour
 
 ## Meta
 
-* Code: `git clone git://github.com/dirkk/mustache.xq.git`
+* Code: `git clone git://github.com/JosuaKrause/mustache.xq.git`
 * Home: <http://mustache.github.com>
-* Bugs: <http://github.com/dirkk/mustache.xq/issues>
+* Bugs: <http://github.com/JosuaKrause/mustache.xq/issues>
 
 [1]: http://code.google.com/p/google-ctemplate/
 [2]: http://www.ivan.fomichev.name/2008/05/erlang-template-engine-prototype.html
-[3]: http://github.com/dirkk/mustache.xq/issues
+[3]: http://github.com/JosuaKrause/mustache.xq/issues
 [4]: http://basex.org
 [5]: http://github.com/dscape/mustache.xq
 [6]: http://docs.basex.org/wiki/Options#REPOPATH
+[7]: http://docs.basex.org/wiki/RESTXQ
 
