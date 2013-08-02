@@ -85,23 +85,27 @@ declare function nextToken($in as xs:string?, $sdelim as xs:string, $edelim as x
 };
 
 declare function nextToken_($in as xs:string?, $sdelim as xs:string, $edelim as xs:string) as element() {
+  (: starting delimiter :)
   if(fn:starts-with($in, $sdelim)) then
     let $nextc := fn:substring($in, 3, 1),
-        $slen := fn:string-length($sdelim)
-    return
-      if($nextc eq "#") then token($parser:_START_SECTION_, $in, $slen + 1)
-      else if($nextc eq "^") then token($parser:_START_INVERT_, $in, $slen + 1)
-      else if($nextc eq "/") then token($parser:_START_END_, $in, $slen + 1)
-      else if($nextc eq "!") then token($parser:_START_COMMENT_, $in, $slen + 1)
-      else if($nextc eq ">") then token($parser:_START_PARTIAL_, $in, $slen + 1)
-      else if($nextc eq "=") then token($parser:_START_DELIM_, $in, $slen + 1)
-      else if($nextc eq "{") then token($parser:_START_TRIPLE_, $in, $slen + 1)
-      else if($nextc eq "&amp;") then token($parser:_START_UNESCAPE_, $in, $slen + 1)
-      else if($nextc eq "*") then token($parser:_START_EXT_, $in, $slen + 1)
-      else if($nextc eq ":") then token($parser:_START_FUN_, $in, $slen + 1)
-      else token($parser:_START_VAR_, $in, $slen)
+        $slen  := fn:string-length($sdelim),
+        $token := switch($nextc)
+                    case "#" return $parser:_START_SECTION_
+                    case "^" return $parser:_START_INVERT_
+                    case "/" return $parser:_START_END_
+                    case "!" return $parser:_START_COMMENT_
+                    case ">" return $parser:_START_PARTIAL_
+                    case "=" return $parser:_START_DELIM_
+                    case "{" return $parser:_START_TRIPLE_
+                    case "*" return $parser:_START_EXT_
+                    case ":" return $parser:_START_FUN_
+                    case "&amp;" return $parser:_START_UNESCAPE_
+                    default return $parser:_START_VAR_
+    return token($token, $in, if($token eq $parser:_START_VAR_) then $slen else $slen + 1)
+  (: ending delimiter :)
   else if(fn:starts-with($in, $edelim)) then
     token($parser:_END_, $in, fn:string-length($edelim))
+  (: text :)
   else
     let $ls := fn:string-length(fn:substring-before($in, $sdelim)),
         $le := fn:string-length(fn:substring-before($in, $edelim)),
@@ -134,7 +138,7 @@ declare function parseSection($in as xs:string?, $n as xs:double, $sd as xs:stri
                $remain4 := $r4/@remain/fn:string()
            return
              if($r4/@value ne $r/@value) then
-               fn:error(xs:QName("parser:ERR002"), "mismatched sections: " || $r/@value || " and " || $r4/@value)
+               fn:error(xs:QName("parser:ERR002"), "Mismatched sections: " || $r/@value || " and " || $r4/@value)
              else
                let $r5 := nextToken($remain4, $sd, $ed),
                    $token5 := $r5/@token/fn:number(),
@@ -166,9 +170,10 @@ declare function parseDotNotation($n, $name) {
     }
   else
     element {
-      if($n eq $parser:_START_VAR_) then 'etag'
-      else if($n eq $parser:_START_EXT_) then 'rtag'
-      else "utag"
+      switch($n)
+        case $parser:_START_VAR_ return 'etag'
+        case $parser:_START_EXT_ return 'rtag'
+        default return "utag"
     } {
       attribute name { $name }
     }
