@@ -3,12 +3,17 @@
 
   Copyright 2011 John Snelson 
   twitter: @jpcs
+  
+  (c) 2013 Josua Krause
 :)
 xquery version "3.0";
 
 module namespace parser = "http://basex.org/modules/mustache/parser";
 declare default function namespace "http://basex.org/modules/mustache/parser";
 
+(:~
+ : Enumeration of symbols.
+ :)
 declare variable $parser:_EOF_ := 0;
 declare variable $parser:_START_SECTION_ := 1;
 declare variable $parser:_START_INVERT_ := 2;
@@ -24,6 +29,11 @@ declare variable $parser:_START_FUN_ := 13;
 declare variable $parser:_END_ := 11;
 declare variable $parser:_STRING_ := 12;
 
+(:~
+ : Parses a string into an interpretable mustache representation.
+ : @param $template The template to parse.
+ : @return The interpretable representation.
+ :)
 declare function parse($template as xs:string) as element() {
    parseContent($template, "{{", "}}")
 };
